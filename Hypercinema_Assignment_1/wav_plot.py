@@ -4,8 +4,11 @@
 # peak finding tutorial: https://stackoverflow.com/questions/1713335/peak-finding-algorithm-for-python-scipy
 import wave
 
-#file_name = 'countman.wav'
-file_name = '230918_Weber_1_Denoised.wav'
+#file_name = '230918_Weber_1_Denoised.wav'
+# file_name = '230918_Weber&Iris_1_Denoised.wav'
+# file_name = '230918_Weber&Iris_1_Denoised_Compressed.wav'
+# file_name = '230918_Weber_Iso_1.wav'
+file_name = '230918_Iris_Iso_1.wav'
 print('File name:', file_name)
 
 wav_obj =  wave.open(file_name, 'rb')
@@ -54,38 +57,60 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
   
 # Compare 4 different peak paths, very helpful for fitting to peaks
-# x = l_channel
-# peaks, _ = find_peaks(x, distance=1000, prominence = 1000)          # prominence parameter too close
-# peaks2, _ = find_peaks(x, distance=1000, prominence = 5000)         # this one looks the best for countman.wav
-# peaks3, _ = find_peaks(x, distance=1000, prominence = 10000)        # this one bypasses peaks i'd like to keep
-# peaks4, _ = find_peaks(x, distance=1000, prominence = 15000)        # ditto
-# plt.subplot(2, 2, 1) 
-# plt.plot(times[peaks], x[peaks], "xr"); plt.plot(times, x); plt.legend(['p=1000'])
-# plt.subplot(2, 2, 2)
-# plt.plot(times[peaks2], x[peaks2], "ob"); plt.plot(times, x); plt.legend(['p=5000'])
-# plt.subplot(2, 2, 3)
-# plt.plot(times[peaks3], x[peaks3], "vg"); plt.plot(times, x); plt.legend(['p=10000'])
-# plt.subplot(2, 2, 4)
-# plt.plot(times[peaks4], x[peaks4], "xk"); plt.plot(times, x); plt.legend(['p=15000'])
-# plt.show()
+x = l_channel
+peaks, _ = find_peaks(x, distance=1000, prominence = 500)          # prominence parameter too close
+peaks2, _ = find_peaks(x, distance=1000, prominence = 1000)         # this one looks the best for countman.wav
+peaks3, _ = find_peaks(x, distance=1000, prominence = 1500)        # this one bypasses peaks i'd like to keep
+peaks4, _ = find_peaks(x, distance=1000, prominence = 2000)        # ditto
+plt.subplot(2, 2, 1) 
+plt.plot(times[peaks], x[peaks], "xr"); plt.plot(times, x); plt.legend(['p=500'])
+plt.subplot(2, 2, 2)
+plt.plot(times[peaks2], x[peaks2], "ob"); plt.plot(times, x); plt.legend(['p=1000'])
+plt.subplot(2, 2, 3)
+plt.plot(times[peaks3], x[peaks3], "vg"); plt.plot(times, x); plt.legend(['p=1500'])
+plt.subplot(2, 2, 4)
+plt.plot(times[peaks4], x[peaks4], "xk"); plt.plot(times, x); plt.legend(['p=2000'])
+plt.show()
 
 # just one at a time
-x = l_channel
-peaks, _ = find_peaks(x, distance=500, prominence = 5000)          # prominence parameter too close
-plt.plot(times[peaks], x[peaks], "xr"); plt.plot(times, x); plt.legend(['p=5000'])
-plt.show()
+# x = l_channel
+# peaks, _ = find_peaks(x, distance=500, prominence = 1000)          # prominence parameter too close
+# plt.plot(times[peaks], x[peaks], "xr"); plt.plot(times, x); plt.legend(['p=1000'])
+# plt.show()
 
 
 # ---- PRINT OUT HARD VALUES AS ARDUINO CODE
 
-last_ts = 0                                     # track the last value
-low_delay = 40
-for i in times[peaks]:                          # if using compare-4 -- make sure using correct array
-    curr_ts = int(i*1000)                       # times is in SECONDS -- convert to MILLISECONDS
-    low_time = curr_ts - last_ts - low_delay     
-    if low_time >= low_delay:                   # catch any close peaks that might have come through...
-        print("delay(" + str(low_time) + ");")  # cast to str for python print concatenation, python won't concat ints
-        print("digitalWrite(13, HIGH);  // "+str(i))    # comment timestamp in seconds to help manual analysis
-        print("delay(40);")                     # hardcoded value of 40ms between HIGH and LOW, which is a pretty quick strike
-        print("digitalWrite(13, LOW);")
-        last_ts = curr_ts
+# last_ts = 0                                     # track the last value
+# low_delay = 20
+# for i in times[peaks]:                          # if using compare-4 -- make sure using correct array
+#     curr_ts = int(i*1000)                       # times is in SECONDS -- convert to MILLISECONDS
+#     low_time = curr_ts - last_ts - low_delay     
+#     if low_time >= low_delay:                   # catch any close peaks that might have come through...
+#         print("delay(" + str(low_time) + ");")  # cast to str for python print concatenation, python won't concat ints
+#         print("digitalWrite(13, HIGH);  // "+str(i))    # comment timestamp in seconds to help manual analysis
+#         print("delay("+str(low_delay)+")")                     # hardcoded value of 40ms between HIGH and LOW, which is a pretty quick strike
+#         print("digitalWrite(13, LOW);")
+#         last_ts = curr_ts
+        
+        
+# ---- WRITE TO FILE--  HARD VALUES AS ARDUINO CODE
+
+write = 0
+
+if write != 0:
+    
+    f = open("weber.txt", "a")
+    last_ts = 0                                     # track the last value
+    low_delay = 20
+    for i in times[peaks]:                          # if using compare-4 -- make sure using correct array
+        curr_ts = int(i*1000)                       # times is in SECONDS -- convert to MILLISECONDS
+        low_time = curr_ts - last_ts - low_delay     
+        if low_time >= low_delay:                   # catch any close peaks that might have come through...
+            f.write("delay(" + str(low_time) + ");\n")  # cast to str for python print concatenation, python won't concat ints
+            f.write("digitalWrite(13, HIGH);  // "+str(i)+"\n")    # comment timestamp in seconds to help manual analysis
+            f.write("delay("+str(low_delay)+");\n")                     # hardcoded value of 40ms between HIGH and LOW, which is a pretty quick strike
+            f.write("digitalWrite(13, LOW);\n")
+            last_ts = curr_ts
+    f.close()
+    print('write complete')
