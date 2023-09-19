@@ -132,7 +132,7 @@ if write != 0:
                 f.write("digitalWrite(12, LOW);\n")
                 
             last_ts = curr_ts
-            peaks_ref = np.delete(peaks_ref, 0)
+            peaks_ref = np.delete(peaks_ref, 0) # fastest way i could think to reference itself; self destruct
             
     f.close()
     print('write complete')
