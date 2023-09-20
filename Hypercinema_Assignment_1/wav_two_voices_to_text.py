@@ -127,10 +127,10 @@ if write != 0:
     
     low_delay = 20                      # the time between pin HIGH and LOW
     last_ts = 0                         # track timestamp of last peak while looping
-    
-    # for frame in times_iris[peaks_all]:                 # times_iris and times_weber are the same, but should use whichever is longer probably
-    for frame in peaks_all:                 # times_iris and times_weber are the same, but should use whichever is longer probably
-        ts = times_iris[frame]
+                 
+    for frame in peaks_all:                  
+        ts = times_iris[frame]                  # times_iris and times_weber are the same, but should use whichever is longer probably
+        
         ts_millis = int(ts*1000)                       # times is in SECONDS -- convert to MILLISECONDS
         low_time = ts_millis - last_ts - low_delay     
         if low_time >= low_delay:                       # catch any close peaks that might have come through...
