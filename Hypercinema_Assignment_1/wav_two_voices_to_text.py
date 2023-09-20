@@ -127,36 +127,35 @@ if write != 0:
     
     low_delay = 20                      # the time between pin HIGH and LOW
     last_ts = 0                         # track timestamp of last peak while looping
-    peaks_ref = peaks_all               # silly solution when adapting this code to track current element in peaks_all 
     
-    for frame in times_iris[peaks_all]:                 # times_iris and times_weber are the same, but should use whichever is longer probably
-        curr_ts = int(frame*1000)                       # times is in SECONDS -- convert to MILLISECONDS
-        low_time = curr_ts - last_ts - low_delay     
+    # for frame in times_iris[peaks_all]:                 # times_iris and times_weber are the same, but should use whichever is longer probably
+    for frame in peaks_all:                 # times_iris and times_weber are the same, but should use whichever is longer probably
+        ts = times_iris[frame]
+        ts_millis = int(ts*1000)                       # times is in SECONDS -- convert to MILLISECONDS
+        low_time = ts_millis - last_ts - low_delay     
         if low_time >= low_delay:                       # catch any close peaks that might have come through...
             
             # if timestamp is in weber -- PIN 13
-            if peaks_ref[0] in peaks_w:
+            if frame in peaks_w:
 
                 f.write("delay(" + str(low_time) + ");\n")  # cast to str for python print concatenation, python won't concat ints
-                f.write("digitalWrite(13, HIGH);  // "+str(frame)+"\tWEBER\n")    # comment timestamp in seconds; speaker to help manual analysis
+                f.write("digitalWrite(13, HIGH);  // "+str(ts)+"\tWEBER\n")    # comment timestamp in seconds; speaker to help manual analysis
                 f.write("delay("+str(low_delay)+");\n")                     # hardcoded value of 40ms between HIGH and LOW, which is a pretty quick strike
                 f.write("digitalWrite(13, LOW);\n")
                 
             # if timestamp is in iris -- PIN 12
-            if peaks_ref[0] in peaks_i:
+            if frame in peaks_i:
             
                 f.write("delay(" + str(low_time) + ");\n")                      # cast to str for python print concatenation, python won't concat ints
-                f.write("digitalWrite(12, HIGH);  // "+str(frame)+"\tIRIS\n")   # comment timestamp in seconds; speaker to help manual analysis
+                f.write("digitalWrite(12, HIGH);  // "+str(ts)+"\tIRIS\n")   # comment timestamp in seconds; speaker to help manual analysis
                 f.write("delay("+str(low_delay)+");\n")                         # hardcoded value of 40ms between HIGH and LOW, which is a pretty quick strike
                 f.write("digitalWrite(12, LOW);\n")
                 
-            last_ts = curr_ts
-            peaks_ref = np.delete(peaks_ref, 0) # fastest way i could think to reference itself; self destruct
-        
+            last_ts = ts_millis
+                    
         else:
             f.write("//proximity too close "+str(low_time)+"\n")    # comment an indicator that a line was skipped
         
     f.close()
     print('write complete')
     print('peaks_all length:', len(peaks_all))
-    print('peaks_ref length:', len(peaks_ref))
