@@ -1,1 +1,7 @@
 .DS_Store
+
+old_ignore
+
+*.mp4
+*.mpeg
+*.mov
