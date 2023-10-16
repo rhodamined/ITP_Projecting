@@ -692,6 +692,6 @@ delay(190);
 digitalWrite(12, HIGH);  // 73.80127059888427	IRIS
 delay(20);
 digitalWrite(12, LOW);
-
+delay(5000);
 
 }
