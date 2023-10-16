@@ -1,9 +1,24 @@
+# Apple
 .DS_Store
 
+# specific folders
 old_ignore
 
+# Media
 *.mp4
 *.mpeg
 *.mov
 
+# Adobe
+*.ai
+*.psd
+*.aep
+*.prproj
+
+
+# Vectorworks
+*.vwx
+
+
+# Visual Studio Code
 .vscode
