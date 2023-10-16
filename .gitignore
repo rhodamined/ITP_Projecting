@@ -5,3 +5,5 @@ old_ignore
 *.mp4
 *.mpeg
 *.mov
+
+.vscode
