@@ -23,7 +23,7 @@ float Eduration, Edistance;
 float e1, e2;
 
 /* "DEBOUNCE" */
-int lastState = 0; // 0 is TOO FAR / CLOSED, 1 is NEAR ENOUGH / OPEN
+int lastDebounceState = 0; // 0 is TOO FAR / CLOSED, 1 is NEAR ENOUGH / OPEN
 unsigned long lastDebounceTime = 0;   // the last time the output pin was toggled
 unsigned long debounceDelay = 1000;   // length of time someone is within distance before curtains open/close
 float hingeDistance = 50;             // The distance at which things change: 50cm
@@ -111,11 +111,11 @@ void loop() {
   // borrowed & adapted from: https://docs.arduino.cc/built-in-examples/digital/Debounce
 
   // close enough and has previously been far
-  if (Edistance < hingeDistance && lastState == 1) {   
+  if (Edistance < hingeDistance && lastDebounceState == 1) {   
     // reset the debouncing timer
     lastDebounceTime = millis();
   }   
-  else if (Edistance > hingeDistance && lastState == 0) { 
+  else if (Edistance > hingeDistance && lastDebounceState == 0) { 
     // reset the debouncing timer
     lastDebounceTime = millis();
   }
@@ -124,17 +124,17 @@ void loop() {
     // whatever the reading is at, it's been there for longer than the debounce
     // delay, so take it as the actual current state:
 
-    if (lastState == 0){    // move from FAR to NEAR
+    if (lastDebounceState == 0){    // move from FAR to NEAR
       Serial.println("OPEN");
       openCurtain();
       delay(200);
-      lastState = 1;
+      lastDebounceState = 1;
     }
-    else if (lastState == 1){    // move from NEAR to FAR
+    else if (lastDebounceState == 1){    // move from NEAR to FAR
       Serial.println("CLOSE");
       closeCurtain();
       delay(200);
-      lastState = 0;
+      lastDebounceState = 0;
     }
   }
 
