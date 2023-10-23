@@ -140,6 +140,7 @@ void loop() {
   
   else if (runMode == 1) {
     Serial.println("mode is RUNNING");
+    Serial.print("DebounceState");
     Serial.println(lastDebounceState);
   
     // distance sensor
@@ -168,6 +169,7 @@ void loop() {
       // if distance is greater than 1m and curtain is CLOSED - shake slowly, but faster as ppl approach
       if (Edistance > 100) {
         int spd = map(Edistance, 50, 400, 50, 3000);
+        Serial.print("solenoid spd: ");
         Serial.println(spd);
         solenoidStrikeSpeed(spd);
         lastDebounceState = 0;
@@ -183,20 +185,24 @@ void loop() {
       else if (0 < Edistance < hingeDistance) {
 
         if (lastDebounceState == 0) { // person comes close for first time
+          delay(1000); // really critital delay lol -- if try to open directly after solenoid, draws too much power and stalls!!!
           lastDebounceTime = millis();
           lastDebounceState = 1;
           Serial.println(lastDebounceTime);
-          if (lastDebounceState == 1) {
-            if (millis() - lastDebounceTime > debounceDelay) {
-              Serial.println("OPEN");
-              if (testing == 0) {         // not testing mode: open curtain
-                openCurtain();
-              }
-              delay(200);
-              curtainState = 1;
-              lastDebounceState = 0;
+        } 
+        else if (lastDebounceState == 1) {
+          if (millis() - lastDebounceTime > debounceDelay) {
+            Serial.println("OPEN");
+            openCurtain();
+
+            if (testing == 0) {         // not testing mode: open curtain
+              openCurtain();
             }
+            delay(200);
+            curtainState = 1;
+            lastDebounceState = 0;
           }
+          
         }
 
       } else { // moves far away
