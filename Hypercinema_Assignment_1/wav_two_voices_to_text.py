@@ -27,10 +27,10 @@ wav_obj_iris =  wave.open(file_name, 'rb')
 sample_freq_iris = wav_obj_iris.getframerate()  # sample rate
 n_samples_iris = wav_obj_iris.getnframes() # total number of audio samples
 t_audio_iris = n_samples_iris/sample_freq_iris # length of wav file in seconds = total samples / sample rate
-wav_bd_iris = wav_obj_iris.getsampwidth() # sample width -- 2 = 16bit, 3 = 24bit >:(
-signal_wave_iris = wav_obj_iris.readframes(n_samples_iris)
+wav_bd_iris = wav_obj_iris.getsampwidth() # sample width -- 2 = 16bit, 3 = 24bit >:(  -- this file only works with 16bit!
+signal_wave_iris = wav_obj_iris.readframes(n_samples_iris) # reads as a bytes object
 
-signal_array_iris = np.frombuffer(signal_wave_iris, dtype=np.int16)
+signal_array_iris = np.frombuffer(signal_wave_iris, dtype=np.int16) # Interpret a buffer as a 1-dimensional array
 l_channel_iris = signal_array_iris[0::wav_bd_iris] # only using 1 channel for this project
 
 print ('Done processing Iris')
@@ -43,16 +43,19 @@ wav_obj_weber =  wave.open(file_name, 'rb')
 sample_freq_weber = wav_obj_weber.getframerate()  # sample rate
 n_samples_weber = wav_obj_weber.getnframes() # total number of audio samples
 t_audio_weber = n_samples_weber/sample_freq_weber # length of wav file in seconds = total samples / sample rate
-wav_bd_weber = wav_obj_weber.getsampwidth() # sample width -- 2 = 16bit, 3 = 24bit >:(
-signal_wave_weber = wav_obj_weber.readframes(n_samples_weber)
+wav_bd_weber = wav_obj_weber.getsampwidth() # sample width -- 2 = 16bit, 3 = 24bit >:(  -- this file only works with 16bit!
+signal_wave_weber = wav_obj_weber.readframes(n_samples_weber) # reads as a bytes object
 
-signal_array_weber = np.frombuffer(signal_wave_weber, dtype=np.int16)
+signal_array_weber = np.frombuffer(signal_wave_weber, dtype=np.int16) # Interpret a buffer as a 1-dimensional array
 l_channel_weber = signal_array_weber[0::wav_bd_weber] # only using 1 channel for this project
 
 print ('Done processing Weber')
 
 # --- Data Manipulation --- #
-# use numpy functions to get a timestamp for each sample
+# Use numpy functions to get a timestamp for each sample
+
+# np.linspace: Returns num evenly spaced samples, calculated over the interval [start, stop].
+# in this case it returns the timestamp in seconds of each sample,
 times_iris = np.linspace(0, n_samples_iris/sample_freq_iris, num=n_samples_iris)
 times_weber = np.linspace(0, n_samples_weber/sample_freq_weber, num=n_samples_weber)
 
@@ -67,10 +70,36 @@ times_weber = times_weber[0::div_factor]
 l_channel_iris = l_channel_iris[0::div_factor]
 l_channel_weber = l_channel_weber[0::div_factor]
 
+
 # --- Calculate Peaks --- #
-# use scipy function find_peaks to 
-# values for distance, prominance were chosen based on visual analysis of the waveforms when plotted
-# most of the futzing around finding a reasonable fit was done in wav_plot.py, which plots 4 subplots in comparison
+# use scipy function find_peaks to compare best-fit prominences for weber and iris sound files
+# due to time constraints, only distance and prominence were used
+# ALL PARAMETERS: scipy.signal.find_peaks(x, height=None, threshold=None, distance=None, prominence=None, width=None, wlen=None, rel_height=0.5, plateau_size=None)
+
+demox4 = 1  
+if demox4 != 0:
+    x = l_channel_weber # weber first speaker
+    plt.title("Weber") 
+
+    #x = l_channel_iris  # iris second speaker
+    #plt.title("Iris") 
+
+    peaks, _ = find_peaks(x, distance=1000, prominence = 1000)
+    peaks2, _ = find_peaks(x, distance=1000, prominence = 5000)
+    peaks3, _ = find_peaks(x, distance=1000, prominence = 10000)
+    peaks4, _ = find_peaks(x, distance=1000, prominence = 15000)
+    plt.subplot(2, 2, 1)
+    plt.plot(peaks, x[peaks], "xr"); plt.plot(x); plt.legend(['prominence = 1000'])
+    plt.subplot(2, 2, 2)
+    plt.plot(peaks2, x[peaks2], "ob"); plt.plot(x); plt.legend(['prominence = 5000'])
+    plt.subplot(2, 2, 3)
+    plt.plot(peaks3, x[peaks3], "vg"); plt.plot(x); plt.legend(['prominence = 10000'])
+    plt.subplot(2, 2, 4)
+    plt.plot(peaks4, x[peaks4], "xk"); plt.plot(x); plt.legend(['prominence = 15000'])
+    plt.show()
+
+
+# --- Choose the best ones and plot together --- #
 x = l_channel_weber # weber first speaker
 y = l_channel_iris  # iris second speaker
 peaks_w, _ = find_peaks(x, distance=1000, prominence = 1000)  # weber
@@ -80,24 +109,26 @@ peaks_i, _ = find_peaks(y, distance=1000, prominence = 500)  # iris
 print('peaks i', peaks_i)
 print('peaks w', peaks_w)
 
-# plot weber
-plt.subplot(3, 1, 1) 
-plt.plot(times_weber[peaks_w], x[peaks_w], "ob"); plt.plot(times_weber, x); plt.legend(['WEBER p=1000'])
+# display graph (if not demoing the x4)
+if demox4 == 0:
+    # plot weber
+    plt.subplot(3, 1, 1) 
+    plt.plot(times_weber[peaks_w], x[peaks_w], "ob"); plt.plot(times_weber, x); plt.legend(['WEBER p=1000'])
 
-# plot iris
-plt.subplot(3, 1, 2)
-plt.plot(times_iris[peaks_i], y[peaks_i], "xr"); plt.plot(times_iris, y); plt.legend(['IRIS p=500'])
+    # plot iris
+    plt.subplot(3, 1, 2)
+    plt.plot(times_iris[peaks_i], y[peaks_i], "xr"); plt.plot(times_iris, y); plt.legend(['IRIS p=500'])
 
-# plot both overlaid
-plt.subplot(3, 1, 3)
-plt.plot(times_iris, y)
-plt.plot(times_weber, x)
-plt.plot(times_weber[peaks_w], x[peaks_w], "ob")
-plt.plot(times_iris[peaks_i], y[peaks_i], "xr")
-plt.legend(['OVERLAID'])
+    # plot both overlaid
+    plt.subplot(3, 1, 3)
+    plt.plot(times_iris, y)
+    plt.plot(times_weber, x)
+    plt.plot(times_weber[peaks_w], x[peaks_w], "ob")
+    plt.plot(times_iris[peaks_i], y[peaks_i], "xr")
+    plt.legend(['OVERLAID'])
 
-# show figure
-plt.show()
+    # show figure
+    plt.show()
 
 
 # ---- WRITE TO FILE ---- #
@@ -117,8 +148,8 @@ for e in peaks_i:
 peaks_all = np.sort(peaks_all)   
 print(peaks_all)
 
-# do the writing
-write = 1           # toggle write on/off 0 = OFF
+### do the writing
+write = 0           # toggle write on/off 0 = OFF
 
 if write != 0:
     
@@ -135,21 +166,21 @@ if write != 0:
         low_time = ts_millis - last_ts - low_delay     
         if low_time >= low_delay:                       # catch any close peaks that might have come through...
             
-            # if timestamp is in weber -- PIN 13
+            # if timestamp is in WEBER -- WEBER_PIN will be defined in Arduino code
             if frame in peaks_w:
 
                 f.write("delay(" + str(low_time) + ");\n")  # cast to str for python print concatenation, python won't concat ints
-                f.write("digitalWrite(13, HIGH);  // "+str(ts)+"\tWEBER\n")    # comment timestamp in seconds; speaker to help manual analysis
+                f.write("digitalWrite(WEBER_PIN, HIGH);  // "+str(ts)+"\tWEBER\n")    # comment timestamp in seconds; speaker to help manual analysis
                 f.write("delay("+str(low_delay)+");\n")                     # hardcoded value of 40ms between HIGH and LOW, which is a pretty quick strike
-                f.write("digitalWrite(13, LOW);\n")
+                f.write("digitalWrite(WEBER_PIN, LOW);\n")
                 
-            # if timestamp is in iris -- PIN 12
+            # if timestamp is in IRIS -- IRIS_PIN will be defined in Arduino code
             if frame in peaks_i:
             
                 f.write("delay(" + str(low_time) + ");\n")                      # cast to str for python print concatenation, python won't concat ints
-                f.write("digitalWrite(12, HIGH);  // "+str(ts)+"\tIRIS\n")   # comment timestamp in seconds; speaker to help manual analysis
+                f.write("digitalWrite(IRIS_PIN, HIGH);  // "+str(ts)+"\tIRIS\n")   # comment timestamp in seconds; speaker to help manual analysis
                 f.write("delay("+str(low_delay)+");\n")                         # hardcoded value of 40ms between HIGH and LOW, which is a pretty quick strike
-                f.write("digitalWrite(12, LOW);\n")
+                f.write("digitalWrite(IRIS_PIN, LOW);\n")
                 
             last_ts = ts_millis
                     

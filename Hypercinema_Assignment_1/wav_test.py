@@ -5,7 +5,8 @@ import wave
 # I am not sure what exactly the data we are even planning is....
 # there's probably an easy math transformation to make it less hefty -- but I do not know how lol
 
-file_name = 'countman.wav'
+file_name = '230918_Iris_Iso_1.wav'
+#file_name = 'countman.wav'
 #file_name = 'HC-RecTest_2a_16bit.wav'
 #file_name = 'HC-RecTest_3_16bit.wav'
 #file_name = 'HC-RecTest_4_16bit.wav'
