@@ -1,0 +1,1 @@
+Class repo for Connected Devices SP24
