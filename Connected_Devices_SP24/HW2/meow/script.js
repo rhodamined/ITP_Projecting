@@ -6,11 +6,14 @@ document.getElementById("button-mouse").addEventListener("click", function() {
 
     console.log("clicked button-mouse");
 
-    let list = document.getElementsByClassName("ms");
-    for (let e of list) {
-        e.classList.add("hide");
-    }
+    let mice = document.getElementsByClassName("ms");
+    let cats = document.getElementsByClassName("cat");
+
+    for (let e of mice) { e.classList.add("hide"); };
+    for (let e of cats) { e.classList.add("hide"); };
+
     document.getElementById("mouse").classList.remove("hide");
+    document.getElementById("cat4").classList.remove("hide");
 })
 
 // Make the mouse a mouse
@@ -33,16 +36,19 @@ document.getElementById("button-churu").addEventListener("click", function() {
 
     console.log("clicked button-churu");
 
-    let list = document.getElementsByClassName("ms");
-    for (let e of list) {
-        e.classList.add("hide");
-    }
+    let mice = document.getElementsByClassName("ms");
+    let cats = document.getElementsByClassName("cat");
+
+    for (let e of mice) { e.classList.add("hide"); };
+    for (let e of cats) { e.classList.add("hide"); };
+    
     document.getElementById("churu").classList.remove("hide");
+    document.getElementById("cat3").classList.remove("hide");
 })
 
 // Make the churu the mouse
 document.addEventListener("mousemove", function(e) {
-    let x = e.clientX-50;
+    let x = e.clientX-100;
     let y = e.clientY+50;
 
     let mouse = document.getElementById("churu");
@@ -58,17 +64,20 @@ document.getElementById("button-spoon").addEventListener("click", function() {
 
     console.log("clicked button-spoon");
 
-    let list = document.getElementsByClassName("ms");
-    for (let e of list) {
-        e.classList.add("hide");
-    }
+    let mice = document.getElementsByClassName("ms");
+    let cats = document.getElementsByClassName("cat");
+
+    for (let e of mice) { e.classList.add("hide"); };
+    for (let e of cats) { e.classList.add("hide"); };
+    
     document.getElementById("spoon").classList.remove("hide");
+    document.getElementById("cat2").classList.remove("hide");
 })
 
 // Make the spoon the mouse
 document.addEventListener("mousemove", function(e) {
-    let x = e.clientX+100;
-    let y = e.clientY-150;
+    let x = e.clientX-200;
+    let y = e.clientY-350;
 
     let mouse = document.getElementById("spoon");
 
@@ -83,11 +92,14 @@ document.getElementById("button-roach").addEventListener("click", function() {
 
     console.log("clicked button-roach");
 
-    let list = document.getElementsByClassName("ms");
-    for (let e of list) {
-        e.classList.add("hide");
-    }
+    let mice = document.getElementsByClassName("ms");
+    let cats = document.getElementsByClassName("cat");
+
+    for (let e of mice) { e.classList.add("hide"); };
+    for (let e of cats) { e.classList.add("hide"); };
+    
     document.getElementById("roach").classList.remove("hide");
+    document.getElementById("cat1").classList.remove("hide");
 })
 
 // Make the roach the mouse
