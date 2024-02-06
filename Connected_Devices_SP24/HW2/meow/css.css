@@ -1,0 +1,60 @@
+/* * {
+    cursor: none;
+} */
+
+.container {
+    position: relative;
+    margin: auto;
+}
+
+#box1 {
+    position: absolute;
+    /* z-index: 6; */
+}
+
+#box2 {
+    position: absolute;
+    /* z-index: 4; */
+}
+
+#cat1 {
+    position: absolute;
+    /* z-index: 5; */
+
+    /* Out of view */
+    left: 170px;
+    top: 145px;
+
+}
+
+#cat2 {
+    position: absolute;
+    /* z-index: 3; */
+
+    /* Out of view */
+    left: -155px;
+}
+
+#cat3 {
+    position: absolute;
+    /* z-index: 2; */
+
+    /* Out of view */
+    left: 230px;
+}
+
+#cat4 {
+    position: absolute;
+    /* z-index: 1; */
+
+    /* Out of view */
+    top: -295px;
+}
+
+#mouse {
+
+    position: absolute;
+    z-index: 10;
+
+    width: 200px;
+}
