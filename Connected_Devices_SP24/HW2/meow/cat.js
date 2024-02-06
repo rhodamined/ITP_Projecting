@@ -26,30 +26,18 @@ class Cat {
     }
 }
 
+// make cats
 let catTop = new Cat("Peeking", document.getElementById("cat1"));
 let catRight = new Cat("Grumpy", document.getElementById("cat2"));
 let catLeft = new Cat ("Cranky", document.getElementById("cat3"));
 let catBottom = new Cat ("Droopy", document.getElementById("cat4"));
 
-// This will log the width of the viewport
-
+// make array of cats
 let allCats = [catTop, catRight, catLeft, catBottom];
 
-let originX = window.innerWidth/2;
-let originY = window.innerHeight/2;
-
-
-// Make the mouse a mouse
-document.addEventListener("mousemove", function(e) {
-
-    let x = e.clientX-40;
-    let y = e.clientY-30;
-
-    let mouse = document.getElementById("mouse");
-
-    mouse.style.left = x + "px";
-    mouse.style.top = y + "px";
-})
+// center of container for future calculations
+// let originX = window.innerWidth/2;
+// let originY = window.innerHeight/2;
 
 // Add cats
 document.addEventListener("mousemove", function(e) {
@@ -59,6 +47,8 @@ document.addEventListener("mousemove", function(e) {
 
     let percentX = x/(window.innerWidth);
     let percentY = y/(window.innerHeight);
+    // let percentX = x/(window.innerWidth);
+    // let percentY = y/(window.innerHeight);
 
     // console.log('mousemove left: ' + x + " top: " + y);
     // console.log('percent left: ' + percentX + " top: " + percentY);
@@ -85,6 +75,6 @@ document.addEventListener("mousemove", function(e) {
         kitty.setTop(newY);
 
     }
-
+    
 })
 
