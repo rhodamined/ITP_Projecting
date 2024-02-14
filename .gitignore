@@ -23,7 +23,9 @@ old_ignore
 # Visual Studio Code
 .vscode
 
-
+# venv
 .venv
 
+# configs
 config.h
+config.js
