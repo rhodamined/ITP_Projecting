@@ -25,3 +25,5 @@ old_ignore
 
 
 .venv
+
+config.h
