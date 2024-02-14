@@ -5,25 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Websocket test!</title>
 </head>
+<script src="config.js"></script>
+<script src="script.js"></script>
 <body>
     <p id="socket-data"></p>
-    <script>
-        const socket = new WebSocket("ws://localhost:1880/testpage");
-
-        socket.addEventListener("open", handleSocketOpen);
-
-        function handleSocketOpen() {
-            document.body.style.backgroundColor = "green";
-        }
-
-        socket.addEventListener("message", handleSocketMessage);
-        
-        function handleSocketMessage(event) {
-            console.log("socket");
-            document.body.style.backgroundColor = "yellow";
-            document.getElementById("socket-data").innerHTML = event.data;
-        }
-        
-    </script>
 </body>
 </html>
