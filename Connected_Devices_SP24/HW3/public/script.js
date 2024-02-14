@@ -18,17 +18,33 @@ const sensorMax = 450;
 
 function handleSocketMessage(event) {
     
-    let num = parseInt(event.data);
+
+    let data = event.data.split(',');
+
+    console.log(data);
+
+    let num = parseInt(data[0]);
+    let buttonState = parseInt(data[1]);
 
     let y = 0;
     
     let elem = document.getElementById("socket-data");
+    let body = document.body;
+
     // let scale = elem.style.transform;
     // console.log(scale);
 
     // elem.style.transform = "scale(0.2)";
 
-    if (num < 9999) { // 9999 is out of range
+    // handle button
+    if (buttonState == 0) {
+        body.style.backgroundColor = "white";
+    } else {
+        body.style.backgroundColor = "black";
+    }
+
+    // handle ToF measurement
+    if (num < 3000) { // 9999 is out of range
         elem.style.backgroundColor = "blue";
         if (num >= sensorMin && num < sensorMax) {
             y = map_range(num, sensorMin, sensorMax, 0, 200);
@@ -37,14 +53,16 @@ function handleSocketMessage(event) {
         } 
         elem.style.height = y+"px";
 
-    } else if (num == 9999){
+    } else if (num >= 3000){
         console.log(9999)
         elem.style.backgroundColor = "red";
 
     }
     // console.log(y);
 
-    elem.innerHTML = event.data;
+    let label = num <= 3000 ? num : "OOR";
+
+    elem.innerHTML = label;
 }
 
 

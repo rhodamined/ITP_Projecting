@@ -6,11 +6,17 @@
 //------ WIFI CONFIG ------//
 WiFiClient client;
 
-const char server[] = MATT_server;        // local IP address of receiver device goes here
-const int portNum = MATT_portNum;         // desired port #. Make sure the receiver is listening on the same port!
+// const char server[] = MATT_server;        // local IP address of receiver device goes here
+// const int portNum = MATT_portNum;         // desired port #. Make sure the receiver is listening on the same port!
 
-const char WIFI_SSID[] = MATT_WIFI_SSID;  // WiFi network name
-const char WIFI_PASS[] = MATT_WIFI_PASS;  // WiFi password 
+// const char WIFI_SSID[] = MATT_WIFI_SSID;  // WiFi network name
+// const char WIFI_PASS[] = MATT_WIFI_PASS;  // WiFi password 
+
+const char server[] = ITP_server;        // local IP address of receiver device goes here
+const int portNum = ITP_portNum;         // desired port #. Make sure the receiver is listening on the same port!
+
+const char WIFI_SSID[] = ITP_WIFI_SSID;  // WiFi network name
+const char WIFI_PASS[] = ITP_WIFI_PASS;  // WiFi password 
 
 //------ TIME OF FLIGHT INIT ------//
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
@@ -85,7 +91,7 @@ void loop() {
     client.println(String(lastMeasure) + ',' + String(buttonState));
     Serial.println(String(lastMeasure) + ',' + String(buttonState));
 
-    delay(50);
+    delay(100);
   }
 }
 
