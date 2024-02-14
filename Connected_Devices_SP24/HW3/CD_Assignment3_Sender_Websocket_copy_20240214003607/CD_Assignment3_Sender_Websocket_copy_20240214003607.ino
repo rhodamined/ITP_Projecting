@@ -15,21 +15,24 @@ const char WIFI_PASS[] = MATT_WIFI_PASS;  // WiFi password
 //------ TIME OF FLIGHT INIT ------//
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 
-//------ LEDS ------//
+//------ HARDWARE ------//
 const int redLedPin = 14;
 const int greenLedPin = 15;
+const int buttonPin = 12;
 
 //------ Global vars ------//
 // char lastMeasure[] = "";
 int lastMeasure = 9999;
+int buttonState = 0;
 
 void setup() {
   // init serial
   Serial.begin(9600);
 
-  // indicator lights
+  // indicator lights, button
   pinMode(redLedPin, OUTPUT);
   pinMode(greenLedPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
 
   // init TOF sensor
   if (!lox.begin()) {
@@ -56,6 +59,8 @@ void setup() {
 
 void loop() {
 
+  buttonState = digitalRead(buttonPin);
+
   VL53L0X_RangingMeasurementData_t measure;
         
   lox.rangingTest(&measure, true); // pass in 'true' to get debug data printout!
@@ -74,11 +79,11 @@ void loop() {
     delay(1000);
     return;
   } else {
-    // add something more interesting here
     toggleLED("green");
     // Serial.print("sending TCP message");
-    Serial.println(lastMeasure);
-    client.println(lastMeasure);
+    // Serial.println(lastMeasure + ',' + buttonState);
+    client.println(String(lastMeasure) + ',' + String(buttonState));
+    Serial.println(String(lastMeasure) + ',' + String(buttonState));
 
     delay(50);
   }

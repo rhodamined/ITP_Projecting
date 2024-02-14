@@ -17,27 +17,38 @@ const sensorMin = 30;
 const sensorMax = 450;
 
 function handleSocketMessage(event) {
-    // console.log("socketMessageEvent");
     
     let num = parseInt(event.data);
-    console.log(num);
 
     let y = 0;
-
+    
     let elem = document.getElementById("socket-data");
+    // let scale = elem.style.transform;
+    // console.log(scale);
 
-    if (num >= sensorMin && num < sensorMax) {
-        y = map_range(num, sensorMin, sensorMax, 0, 200);
-    } else if (num < sensorMin) {
-        y = 0;
-    } else if (num > sensorMax) {
-        // y = -window.innerHeight;
+    // elem.style.transform = "scale(0.2)";
+
+    if (num < 9999) { // 9999 is out of range
+        elem.style.backgroundColor = "blue";
+        if (num >= sensorMin && num < sensorMax) {
+            y = map_range(num, sensorMin, sensorMax, 0, 200);
+        } else if (num < sensorMin) {
+            y = 0;
+        } 
+        elem.style.height = y+"px";
+
+    } else if (num == 9999){
+        console.log(9999)
+        elem.style.backgroundColor = "red";
+
     }
-    console.log(y);
+    // console.log(y);
 
     elem.innerHTML = event.data;
-    elem.style.height = y+"px";
 }
+
+
+
 
 // always too lazy to write it myself
 // https://stackoverflow.com/questions/5649803/remap-or-map-function-in-javascript
