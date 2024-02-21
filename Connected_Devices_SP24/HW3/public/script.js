@@ -31,11 +31,6 @@ function handleSocketMessage(event) {
     let elem = document.getElementById("socket-data");
     let body = document.body;
 
-    // let scale = elem.style.transform;
-    // console.log(scale);
-
-    // elem.style.transform = "scale(0.2)";
-
     // handle button
     if (buttonState == 0) {
         body.style.backgroundColor = "white";
