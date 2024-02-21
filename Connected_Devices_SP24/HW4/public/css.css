@@ -18,6 +18,18 @@ table {
     width: 700px;
 }
 
-.data {
+/* .data {
+    color: blue;
+} */
+
+button {
+    visibility: hidden;
+}
+
+.red {
+    color: red;
+}
+
+.blue {
     color: blue;
 }

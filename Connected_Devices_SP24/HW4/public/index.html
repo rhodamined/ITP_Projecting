@@ -2,18 +2,42 @@
     <head>
         <title>MQTT HTML Client</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+        
+        <!-- CSS -->
+        <link rel="stylesheet" href="css.css">
+
+        <!-- JS -->
+        <script src="config.js"></script>
+        <script src="script.js"></script>
     </head>
 
-    <script src="config.js"></script>
-    <script src="script.js"></script>
 
     <body>
+        <div class="container">
+            <div class="vertical-center">
+                <button id="sendMQTTButton" disabled 
+                    onClick="sendMQTTMessage('button1', 'clicked')">Send MQTT
+                </button>
 
-        <button id="sendMQTTButton" disabled 
-            onClick="sendMQTTMessage('button1', 'clicked')">Send MQTT</button>
-
-        <p id="inTopic"></p>
-        <b><p id="inPayload"></p></b>
+                <table>
+                    <tr>
+                        <td>Topic:</td>
+                        <td></td>
+                        <td id="inTopic" class="data"></td>
+                    </tr>
+                    <tr>
+                        <td>Message:</td>
+                        <td></td>
+                        <td id="inPayload" class="data"></td>
+                    </tr>
+                    <tr>
+                        <td>Timestamp:</td>
+                        <td></td>
+                        <td id="inTimestamp" class="data"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
 
     </body>
 </html>

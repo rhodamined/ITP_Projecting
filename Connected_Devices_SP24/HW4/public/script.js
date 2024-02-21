@@ -38,6 +38,27 @@ function sendMQTTMessage(topic, payload) {
 }
 
 function handleMQTTMessage(msg) {
-    document.querySelector("#inTopic").innerHTML = `Topic: ${msg.destinationName}`;
+    console.log(msg.payloadString);
+
+    let txt = msg.payloadString;
+
+    let arr = document.getElementsByClassName("data");
+    
+
+    if (txt == "DISCONNECTED") {
+        for (let e of arr) {
+            e.classList.add("red");
+            e.classList.remove("blue")
+        }
+    } else {
+        for (let e of arr) {
+            e.classList.add("blue");
+            e.classList.remove("red")
+        }
+    }
+
+    let d = new Date().toISOString(); // timestamp
+    document.querySelector("#inTopic").innerHTML = msg.destinationName;
     document.querySelector("#inPayload").innerHTML = msg.payloadString;
+    document.querySelector("#inTimestamp").innerHTML = d;
 }

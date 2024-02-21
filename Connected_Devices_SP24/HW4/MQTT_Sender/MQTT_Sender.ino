@@ -79,6 +79,16 @@ void setup() {
   //set mqtt credentials, if needed
   mqtt.setUsernamePassword(mqtt_user, mqtt_pass);
 
+  // set a will message
+  const char willTopic[] = "Jasper_TOF";
+  const String willPayload = "DISCONNECTED";
+  const bool willRetain = true;
+  const int willQos = 1;
+
+  mqtt.beginWill(willTopic, willPayload.length(), willRetain, willQos);
+  mqtt.print(willPayload);
+  mqtt.endWill();
+
   if (!mqtt.connect(broker, port)) {
     //error codes
     //  -1: credentials rejected
