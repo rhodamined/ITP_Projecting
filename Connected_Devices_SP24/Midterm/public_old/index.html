@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <script src="https://unpkg.com/p5ble@0.0.7/dist/p5.ble.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <meta charset="utf-8" />
+    </head>
+
+    <body>
+        <button onClick="BLEConnect()">BLE Connect</button>
+        <input id="send_value"/>
+        <button onClick="sendVal()">Send text</button>
+        <script src="config.js"></script>
+        <script src="script.js"></script>
+        <table>
+            <tr>
+                <th id="sensor_val_h">Sensor Value</th>
+                <th id="mode_val_h">Mode Value</th>
+            </tr>
+            <tr>
+                <td id="sensor_timestamp">NA</td>
+                <td id="mode_timestamp">NA</td>
+            </tr>
+            <tr>
+                <td id="sensor_val">NA</td>
+                <td id="mode_val">NA</td>
+            </tr>
+            <tr>
+                <td id="sensor_detail">NA</td>
+                <td id="mode_detail">NA</td>
+            </tr>
+        </table>
+        <main>
+
+        </main>
+        <script src="blobby.js"></script>
+        <script src="sketch.js"></script>
+    </body>
+
+</html>
