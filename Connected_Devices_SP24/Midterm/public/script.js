@@ -31,6 +31,7 @@ function handleNewBLEModeValue(value) {
         "Flipping out"
     ]
     document.getElementById("mode_detail").innerHTML = modeDescriptions[value];
+    document.getElementById("mode_timestamp").innerHTML = getTimestamp();
 }
 
 // LIGHT SENSOR READING
@@ -41,11 +42,18 @@ function handleNewBLESensorValue(value) {
     // detail: is this LIGHT or DARK?
     let state = value > 30 ? "LIGHT" : "DARK";
     document.getElementById("sensor_detail").innerHTML = state;
+
+    document.getElementById("sensor_timestamp").innerHTML = getTimestamp();
 }
 
 // send values back
-function sendVal() {
-    if (!myCharacteristic) return;
-    BLE.write(myCharacteristic, (document.getElementById("send_value").value));
-    document.getElementById("send_value").value = "";
+async function sendVal() {
+    if (!modeCharacteristic) return;
+    await BLE.write(modeCharacteristic, (document.getElementById("send_value").value));
+    // document.getElementById("send_value").value = "";
+}
+
+function getTimestamp() {
+    let date = new Date();
+    return date.toLocaleTimeString();
 }

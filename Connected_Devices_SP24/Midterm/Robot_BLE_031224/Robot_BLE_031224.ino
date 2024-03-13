@@ -54,7 +54,8 @@ bool SERVO_SERIAL = false; // turn on/off debugging for servo angles
 int MODE = 0;
 int MODE_LAST = 0;
 int MODE_TS = 0;
-bool MODE_AUTO = true;  // if TRUE, will automatically cycle through modes
+bool MODE_CHANGED = false;
+bool MODE_AUTO = false;  // if TRUE, will automatically cycle through modes
                         // TRUE for Intangible Interaction, FALSE for Connected Devices
     // ---- MODE GLOSSARY AO 3/12/24 ----
     // 0: still / turtle pose
@@ -112,7 +113,6 @@ void loop() {
     lastUpdate = millis();
     counter++;
 
-
     //-------- BLUETOOTH --------
     BLEDevice central = BLE.central();
 
@@ -121,25 +121,35 @@ void loop() {
 
       // write to characteristic
       sensorCharacteristic.writeValue(sensorVal);   // stream sensor unless impacting performance
-      modeCharacteristic.writeValue(MODE);      // only write if changed
+
+      // Serial.println(MODE);
+      // Serial.println(MODE_CHANGED);
+      if (MODE_CHANGED) {
+        modeCharacteristic.writeValue(MODE);      // only write if changed
+      }
       
       // if characteristic has BLEWrite access:
-      // if (modeCharacteristic.written()) {
-      //   // get the value here - make sure to use the correct data type!
-      //   int dataIn = modeCharacteristic.value();
-      //   Serial.println(dataIn);
-      // } else {
-      //   digitalWrite(LED_BUILTIN, LOW);
-      // }
+      if (modeCharacteristic.written()) {
+        // get the value here - make sure to use the correct data type!
+        int dataIn = modeCharacteristic.value();
+        int val = parseForHumans(dataIn);
+        Serial.println(val);
+        changeMode(val);
+      } else {
+        digitalWrite(LED_BUILTIN, LOW);
+      }
+    }
+
+    // reset mode changed
+    if (MODE_CHANGED) {
+      MODE_CHANGED = false;
     }
 
     //-------- SERIAL INPUT to change modes etc --------
     if (Serial.available() > 0) {
       int input = Serial.parseInt();
       Serial.println(input);
-      MODE_LAST = MODE;
-      MODE = input;
-      MODE_TS = lastUpdate;
+      changeMode(input);
     }
 
     //-------- SENSOR DATA --------
@@ -152,9 +162,7 @@ void loop() {
       lastSensorChange = lastUpdate;
       digitalWrite(ledPin, LOW);
       // Serial.println("DARK");
-      MODE_LAST = MODE;
-      MODE = 1;
-      MODE_TS = lastUpdate;
+      changeMode(1);
     } 
     // LIGHT - flip out then keel over
     else if (sensorVal >= sensorThreshold && lastSensorState == false){
@@ -162,12 +170,11 @@ void loop() {
       lastSensorChange = lastUpdate;
       digitalWrite(ledPin, HIGH);
       MODE_LAST = MODE;
-      if (MODE_AUTO) {
-        MODE = 8; // when auto, flip out -- will autodirect to MODE 0, be a turtle
+      if (MODE_AUTO == true) {
+        changeMode(8);  // when auto, flip out -- will autodirect to MODE 0, be a turtle
       } else {
-        MODE = 0; // be still
+        changeMode(0);  // be still
       }
-      MODE_TS = lastUpdate;
       // Serial.println("LIGHT");
     }
 
@@ -223,7 +230,7 @@ void loop() {
       }
 
       // change mode after certain time
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+8000) {
           Serial.println("Mode change inside MODE 1");
           newMode();
@@ -249,7 +256,7 @@ void loop() {
       }
 
       // change mode after certain time
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+14000) {
           Serial.println("Mode change inside MODE 2");
           newMode();
@@ -276,7 +283,7 @@ void loop() {
       }
 
       // change mode after certain time
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+8000) {
           Serial.println("Mode change inside MODE 3");
           newMode();
@@ -302,7 +309,7 @@ void loop() {
       }
 
       // change mode after certain time
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+8000) {
           Serial.println("Mode change inside MODE 4");
           newMode();
@@ -326,7 +333,7 @@ void loop() {
       }
 
       // change mode after certain time
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+5000) {
           Serial.println("Mode change inside MODE 5");
           newMode();
@@ -368,7 +375,7 @@ void loop() {
       }
 
       // change mode after certain time
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+4000) {
           Serial.println("Mode change inside MODE 6");
           newMode();
@@ -409,7 +416,7 @@ void loop() {
       }
 
       // change mode after certain time
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+4000) {
           Serial.println("Mode change inside MODE 7");
           newMode();
@@ -451,12 +458,10 @@ void loop() {
       }
 
       // be still 
-      if (MODE_AUTO) {
+      if (MODE_AUTO == true) {
         if (lastUpdate > MODE_TS+1000) {
           Serial.println("Mode change inside MODE 8");
-          MODE_LAST = MODE;
-          MODE = 0;
-          MODE_TS = lastUpdate;
+          changeMode(0);
         }
       }
     }
@@ -480,6 +485,15 @@ void newMode() {
   MODE = getNewMode(sensorVal);
   Serial.println(MODE);
   MODE_TS = lastUpdate;
+  MODE_CHANGED = true;
+}
+
+void changeMode(int pickMode) {
+  MODE_LAST = MODE;
+  MODE = pickMode;
+  Serial.println(MODE);
+  MODE_TS = lastUpdate;
+  MODE_CHANGED = true;
 }
 
 int getNewMode(int seedVal) {
@@ -506,13 +520,16 @@ int getNewMode(int seedVal) {
       return 6;
     case 9:
       return 1;
-
     default:
       // statements
       break;
   } 
-
 }
 
+// I can't figure out byte arrays so fuck it
+// 0 is 48, etc
+int parseForHumans(int num) {
+  return abs(48-num);
+}
 
 
