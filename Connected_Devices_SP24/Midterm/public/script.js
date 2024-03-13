@@ -1,5 +1,6 @@
 let sensorCharacteristic;
 let modeCharacteristic;
+
 window.BLE = new p5ble();
 
 // serviceUUID defined in config.js
@@ -17,6 +18,19 @@ function handleBLEConnected(err, characteristics) {
 function handleNewBLEModeValue(value) {
     // console.log("Mode: " + value);
     document.getElementById("mode_val").innerHTML = value;
+
+    let modeDescriptions = [
+        "still",
+        "Eraser only",
+        "Pencil only",
+        "Pencil Scribble short",
+        "Pencil Scribble long",
+        "lurchy quickstep",
+        "Two step",
+        "Two step v2",
+        "Flipping out"
+    ]
+    document.getElementById("mode_detail").innerHTML = modeDescriptions[value];
 }
 
 // LIGHT SENSOR READING
