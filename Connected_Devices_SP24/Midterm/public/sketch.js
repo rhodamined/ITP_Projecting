@@ -17,6 +17,12 @@ let videoReady = false;
 const devices = [];
 let chosenId = 2;
 
+// BOUNDARY -- hard coded for now 03/13/24
+let boundmaxx = 580;
+let boundminx = 70;
+let boundmaxy = 370;
+let boundminy = 40;
+
 
 
 async function preload() {
@@ -52,6 +58,8 @@ function draw() {
   
     // update HTML table with blob info
     updateBiggestBlob();
+    showBoundary();
+
 
     const currentBlobs = [];
   
@@ -170,6 +178,8 @@ function draw() {
         else if (b.size() > biggestBlob.size()) {
             biggestBlob = b;
         }
+
+        // checkBounds(b);
     }
   
     textAlign(RIGHT);
@@ -237,3 +247,29 @@ function updateBiggestBlob(){
     }
 }
 
+function showBoundary() {
+    stroke(255, 0, 0);
+    noFill();
+    strokeWeight(2);
+    rectMode(CORNERS);
+    rect(boundminx, boundminy, boundmaxx, boundmaxy);
+}
+
+function checkBounds(blob) {
+    if (blob.centerx > boundmaxx) {
+        sendVal(0);
+        console.log("out of bounds max X");
+    } 
+    else if (blob.centerx < boundminx) {
+        sendVal(0);
+        console.log("out of bounds min X");
+    }
+    else if (blob.centery > boundmaxy) {
+        sendVal(0);
+        console.log("out of bounds max Y");
+    }
+    else if (blob.centery < boundminy) {
+        sendVal(0);
+        console.log("out of bounds min Y");
+    }
+}
