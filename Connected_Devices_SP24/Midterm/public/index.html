@@ -27,6 +27,11 @@
             <th id="mode_val_h">Mode Value</th>
         </tr>
         <tr>
+            <th id="label_source">Source</th>
+            <td id="sensor_source">NA</td>
+            <td id="mode_source">NA</td>
+        </tr>
+        <tr>
             <th id="label_timestamp">Timestamp</th>
             <td id="sensor_timestamp">NA</td>
             <td id="mode_timestamp">NA</td>
@@ -40,9 +45,23 @@
             <td id="sensor_detail">NA</td>
             <td id="mode_detail">NA</td>
         </tr>
+        <tr></tr>
+        <tr>
+            <th></th>
+            <th id="label_blob_id">ID</th>
+            <th id="label_x">X</th>
+            <th id="label_y">Y</th>
+        </tr>
+        <tr>
+            <th id="label_biggest_blob">Biggest Blob</th>
+            <td id="val_biggest_blob">NA</td>
+            <td id="x_biggest_blob">NA</td>
+            <td id="y_biggest_blob">NA</td>
+        </tr>
     </table>
-    
+    <div id="biggest_blob"></div>
     <script src="ui.js"></script>
+    <script src="util.js"></script>
     <script src="blobby.js"></script>
     <script src="sketch.js"></script>
   </body>

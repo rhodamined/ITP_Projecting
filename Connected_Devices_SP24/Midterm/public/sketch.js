@@ -4,6 +4,7 @@ let BLE;
 // BLOBS
 const blobs = [];
 let blobCounter = 0;
+let biggestBlob;
 
 // COLOR TRACKING FOR BLOBS
 let trackColor;
@@ -44,10 +45,14 @@ async function setup() {
 
 
 function draw() {
+    
     background(255);
     video.loadPixels();
     image(video, 0, 0);
   
+    // update HTML table with blob info
+    updateBiggestBlob();
+
     const currentBlobs = [];
   
     // Begin loop to walk through every pixel
@@ -154,8 +159,17 @@ function draw() {
         }
     }
   
-    for (let b of blobs) {
+    for (let i = 0; i < blobs.length; i++) {
+        let b = blobs[i];
         b.show();
+
+        if (typeof biggestBlob === "undefined") {
+            biggestBlob = b;
+        }
+        // console.log(biggestBlob);
+        else if (b.size() > biggestBlob.size()) {
+            biggestBlob = b;
+        }
     }
   
     textAlign(RIGHT);
@@ -213,15 +227,13 @@ async function getDevices(deviceInfos) {
       audio: false
     };
     video = createCapture(constraints);
-  }
+}
 
-async function hideVideo() {
-    console.log("hidevideo");
-    let vids = document.getElementsByTagName("video");
-    console.log(vids);
-    // vids is an HTMLCollection
-    for( var i = 0; i < vids.length; i++ ){ 
-        console.log( vids.item(i).src );
-        vids.item(i).classList.add("hide");
+function updateBiggestBlob(){
+    if (biggestBlob) {
+        document.getElementById("val_biggest_blob").innerHTML = biggestBlob.id;
+        document.getElementById("x_biggest_blob").innerHTML = biggestBlob.centerx;
+        document.getElementById("y_biggest_blob").innerHTML = biggestBlob.centery;
     }
 }
+

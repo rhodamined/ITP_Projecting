@@ -10,3 +10,11 @@ canvas {
 .hide {
     display: none;
 }
+
+td, th {
+    text-align: left;
+    width: 100px;
+    /* border: 1px solid black; */
+    padding: 3px;
+    margin: 3px;
+}

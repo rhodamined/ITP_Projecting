@@ -17,20 +17,21 @@ class Blobbo {
     }
   
     show() {
+      // boundaries
       stroke(0);
       fill(255, 100);
       strokeWeight(2);
       rectMode(CORNERS);
       rect(this.minx, this.miny, this.maxx, this.maxy);
 
-      
+      // text info
       textAlign(CENTER);
       fill(0);
-      textSize(64);
+      textSize(48);
       text(this.id, this.minx + (this.maxx - this.minx) * 0.5, this.maxy - 10);
       textSize(20);
-      text(("x = " +this.centerx), this.minx + (this.maxx - this.minx) * 0.5, this.maxy + 20);
-      text(("y = " +this.centery), this.minx + (this.maxx - this.minx) * 0.5, this.maxy + 40);
+      text(("x = " +this.centerx), this.minx + (this.maxx - this.minx) * 0.5, this.maxy - 80);
+      text(("y = " +this.centery), this.minx + (this.maxx - this.minx) * 0.5, this.maxy - 60);
     }
   
     add(x, y) {

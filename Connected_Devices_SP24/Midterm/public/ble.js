@@ -32,6 +32,7 @@ function handleNewBLEModeValue(value) {
     ]
     document.getElementById("mode_detail").innerHTML = modeDescriptions[value];
     document.getElementById("mode_timestamp").innerHTML = getTimestamp();
+    document.getElementById("mode_source").innerHTML = "Arduino";
 }
 
 // LIGHT SENSOR READING
@@ -42,6 +43,7 @@ function handleNewBLESensorValue(value) {
     // detail: is this LIGHT or DARK?
     let state = value > 30 ? "LIGHT" : "DARK";
     document.getElementById("sensor_detail").innerHTML = state;
+    document.getElementById("sensor_source").innerHTML = "Arduino";
 
     document.getElementById("sensor_timestamp").innerHTML = getTimestamp();
 }
@@ -56,6 +58,8 @@ async function sendVal() {
     if (newMode >= 0 && newMode <= 8) {
         await BLE.write(modeCharacteristic, newMode);
         document.getElementById("send_value").value = ""; // clear field
+
+        document.getElementById("mode_source").innerHTML = "Webpage";
     }
 }
 
