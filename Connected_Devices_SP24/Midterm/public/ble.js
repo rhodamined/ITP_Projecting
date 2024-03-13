@@ -13,7 +13,7 @@ function handleBLEConnected(err, characteristics) {
     // console.log(characteristics);
     modeCharacteristic = characteristics[0];
     sensorCharacteristic = characteristics[1];
-    // BLE.startNotifications(sensorCharacteristic, handleNewBLESensorValue);
+    BLE.startNotifications(sensorCharacteristic, handleNewBLESensorValue);
     BLE.startNotifications(modeCharacteristic, handleNewBLEModeValue);
 }
 
@@ -34,13 +34,13 @@ function handleNewBLEModeValue(value) {
     ]
     
     
-    if (value != previousMode){
+    // if (value != previousMode){
         changeMode(value);
         document.getElementById("mode_timestamp").innerHTML = getTimestamp();
         document.getElementById("mode_source").innerHTML = "Arduino";
         document.getElementById("mode_val").innerHTML = value;
         document.getElementById("mode_detail").innerHTML = modeDescriptions[value];
-    }
+    // }
 
 }
 
@@ -75,12 +75,12 @@ async function sendTxtVal() {
 
 // send values back
 async function sendVal(newMode) {
-    console.log("newmode2");
     if (!modeCharacteristic) return;
-    console.log(newMode);
+    // console.log(newMode);
     newMode = parseInt(newMode);
-    console.log(newMode);
+    // console.log(newMode);
     if (newMode >= 0 && newMode <= 8 && newMode != currMode) {
+        console.log("newmode2");
         await BLE.write(modeCharacteristic, newMode);
         document.getElementById("send_value").value = ""; // clear field
 

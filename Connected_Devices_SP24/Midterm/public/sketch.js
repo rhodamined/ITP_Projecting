@@ -15,13 +15,17 @@ let distThreshold = 50;
 let video;
 let videoReady = false;
 const devices = [];
-let chosenId = 2;
+let chosenId = 3;
 
 // BOUNDARY -- hard coded for now 03/13/24
 let boundmaxx = 580;
 let boundminx = 70;
 let boundmaxy = 370;
 let boundminy = 40;
+
+let OOBtimestamp;
+let OOBbounce = 500;
+let OOBbool = false;
 
 
 
@@ -179,7 +183,7 @@ function draw() {
             biggestBlob = b;
         }
 
-        // checkBounds(b);
+        checkBounds(b);
     }
   
     textAlign(RIGHT);
@@ -255,21 +259,57 @@ function showBoundary() {
     rect(boundminx, boundminy, boundmaxx, boundmaxy);
 }
 
-function checkBounds(blob) {
+async function checkBounds(blob) {
+    // let mode;
+
+    let xstatus = document.getElementById("x_status");
+    let ystatus = document.getElementById("y_status");
     if (blob.centerx > boundmaxx) {
-        sendVal(0);
+        // mode = 0;
+        xstatus.innerHTML = "OOB: X MAX";
         console.log("out of bounds max X");
+        if (OOBbool == false) {
+            OOBbool = true;
+            OOBtimestamp = Date.now();
+        }
     } 
     else if (blob.centerx < boundminx) {
-        sendVal(0);
+        // mode = 0;
+        xstatus.innerHTML = "OOB: X IN";
         console.log("out of bounds min X");
+        if (OOBbool == false) {
+            OOBbool = true;
+            OOBtimestamp = Date.now();
+        }
     }
     else if (blob.centery > boundmaxy) {
-        sendVal(0);
+        // mode = 0;
+        ystatus.innerHTML = "OOB: Y MAX";
         console.log("out of bounds max Y");
+        if (OOBbool == false) {
+            OOBbool = true;
+            OOBtimestamp = Date.now();
+        }
     }
     else if (blob.centery < boundminy) {
-        sendVal(0);
+        // mode = 0;
+        ystatus.innerHTML = "OOB: Y MAX";
         console.log("out of bounds min Y");
+        if (OOBbool == false) {
+            OOBbool = true;
+            OOBtimestamp = Date.now();
+        }
     }
+    else {
+        xstatus.innerHTML = "OK";
+        ystatus.innerHTML = "OK";
+        OOBbool = false;
+    }
+    
+    // let ts = Date.now();
+    // if (ts - OOBtimestamp > OOBbounce && OOBbool == true) {
+    //     console.log("debounce");
+    //     await sendVal(mode);
+    // }
+
 }
