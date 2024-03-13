@@ -1,5 +1,20 @@
+#include <ArduinoBLE.h>
 #include <Servo.h>
 
+//-------- BLUETOOTH --------
+// UUID
+char serviceUUID[] = "8dc9513c-4675-45ed-88c6-251640154f83";
+BLEService roboService(serviceUUID);
+
+//create a UUID for each characteristic to be advertised on your service
+char modeCharacteristicUUID[] = "8dc9513c-4675-45ed-88c6-251640154f84";
+char sensorCharacteristicUUID[] = "8dc9513c-4675-45ed-88c6-251640154f85";
+
+BLEIntCharacteristic sensorCharacteristic(sensorCharacteristicUUID, BLERead | BLEWrite| BLENotify); // Int
+BLEIntCharacteristic modeCharacteristic(modeCharacteristicUUID, BLERead | BLEWrite|  BLENotify);    // Int
+
+
+//-------- SERVO --------
 // Servo pins
 int PAN_PIN = 15;
 int TILT_PIN = 21;
@@ -12,7 +27,7 @@ Servo TILT_SERVO;
 int homePan = 90; //  Pencilnub
 int homeTilt = 90; // Eraserhead
 
-// X: PAN aka PENCIL TIP
+// X: PAN aka PENCILNUB
 long xGoalAngle = homePan; 
 long xCurrAngle;
 
@@ -21,6 +36,7 @@ long yGoalAngle = homeTilt;
 long yCurrAngle;
 int stepRate = 70; // update every ___ millis
 
+//-------- SENSOR / INPUT --------
 // light sensor: phototransistor
 int ledPin = 13;
 int sensorPin = A6;
@@ -30,48 +46,63 @@ bool lastSensorState = false; // false: dark, true: light
 int lastSensorChange = 0;
 int bounceThreshold = 3000; // wait 3 seconds once sensing dark before moving again
 
-// JOYSTICK
-// #define VRX_PIN  A7 // Arduino pin connected to VRX pin
-// #define VRY_PIN  A6 // Arduino pin connected to VRY pin
-
-// int xValue = 0; // To store value of the X axis
-// int yValue = 0; // To store value of the Y axis
-
-// bool JOY_SERIAL = false;  // turn on/off debugging for joystick
+//-------- CONTROL --------
+// turn certain features on/off
 bool SERVO_SERIAL = false; // turn on/off debugging for servo angles
 
+// Modes
 int MODE = 0;
 int MODE_LAST = 0;
 int MODE_TS = 0;
+bool MODE_AUTO = true;  // if TRUE, will automatically cycle through modes
+                        // TRUE for Intangible Interaction, FALSE for Connected Devices
+    // ---- MODE GLOSSARY AO 3/12/24 ----
+    // 0: still / turtle pose
+    // 1: Tilt (Eraserhead) ONLY
+    // 2: Pan (Pencilnub) ONLY
+    // 3: still and scribbling (Pencilnub)
+    // 4: big scribble (PencilNub)
+    // 5: Lurchy quickstep
+    // 6: Two step
+    // 7: two step v 2 
+    // 8: flipping out
 
-bool MODE_AUTO = true;
+// Manage time
+long lastUpdate = 0;    // more forgiving but less precise than exact millis
+long counter = 0;       // used as factor by which to slow down time
 
-// for MODES 1 & 2
-bool waveState = false;  // default DOWN = false
-int waveRate = 250;   // millis, time between up and down
-int subWaveState = false;
+int waveRate = 250;       // millis, time between up and down
+bool waveState = false;   // movement is 2-step; wave UP and wave DOWN (names vestigial from arm pat project)
+bool subWaveState = false; // subdivides movement into 4 step for certain modes
 
-bool subWave = false;
-
-// TIMING
-long lastUpdate = 0;
-long counter = 0;
-
-
+//****** SETUP ******
 void setup() {
-  // Serial monitoring
+  
+  //-------- OUTPUT --------
   pinMode(ledPin, OUTPUT);
   Serial.begin(9600);
 
-  //-------- START SERVO setup code --------
-  // attach Servos
+  //-------- BLUETOOTH --------
+  if (!BLE.begin()) {
+    Serial.println("BLE initialization failed.");
+    while (1); //do nothing forever
+  }
+  BLE.setLocalName("TANG_Arduino");
+  BLE.setAdvertisedService(roboService);
+  roboService.addCharacteristic(modeCharacteristic);    // 0
+  roboService.addCharacteristic(sensorCharacteristic);  // 1
+  BLE.addService(roboService);
+  BLE.advertise();
+  Serial.println("BLE peripheral initialized.");
+
+  //-------- SERVO --------
   PAN_SERVO.attach(PAN_PIN);
   TILT_SERVO.attach(TILT_PIN);
-
-  //-------- END SERVO setup code --------
+  
 
 }
 
+//****** LOOP ******
 void loop() {
 
   // instead of delay
@@ -80,6 +111,27 @@ void loop() {
     //-------- WEIRD TIMEKEEPING --------
     lastUpdate = millis();
     counter++;
+
+
+    //-------- BLUETOOTH --------
+    BLEDevice central = BLE.central();
+
+    if (central && central.connected()) {
+      // Serial.println("test");
+
+      // write to characteristic
+      sensorCharacteristic.writeValue(sensorVal);   // stream sensor unless impacting performance
+      modeCharacteristic.writeValue(MODE);      // only write if changed
+      
+      // if characteristic has BLEWrite access:
+      // if (modeCharacteristic.written()) {
+      //   // get the value here - make sure to use the correct data type!
+      //   int dataIn = modeCharacteristic.value();
+      //   Serial.println(dataIn);
+      // } else {
+      //   digitalWrite(LED_BUILTIN, LOW);
+      // }
+    }
 
     //-------- SERIAL INPUT to change modes etc --------
     if (Serial.available() > 0) {
@@ -94,7 +146,7 @@ void loop() {
     sensorVal = analogRead(sensorPin);  // read the input pin
     // Serial.println(sensorVal);          // debug value
 
-    // Dark - work!
+    // DARK - go to work!
     if (sensorVal < sensorThreshold && lastSensorState == true && (lastUpdate - lastSensorChange > bounceThreshold)){
       lastSensorState = false;
       lastSensorChange = lastUpdate;
@@ -104,13 +156,17 @@ void loop() {
       MODE = 1;
       MODE_TS = lastUpdate;
     } 
-    // Light - keep over
+    // LIGHT - flip out then keel over
     else if (sensorVal >= sensorThreshold && lastSensorState == false){
       lastSensorState = true;
       lastSensorChange = lastUpdate;
       digitalWrite(ledPin, HIGH);
       MODE_LAST = MODE;
-      MODE = 8; // flip out -- will autodirect to MODE 0, be a turtle
+      if (MODE_AUTO) {
+        MODE = 8; // when auto, flip out -- will autodirect to MODE 0, be a turtle
+      } else {
+        MODE = 0; // be still
+      }
       MODE_TS = lastUpdate;
       // Serial.println("LIGHT");
     }
@@ -133,6 +189,7 @@ void loop() {
       }
     }
 
+    // ---- GLOSSARY ----
     // 0: still / turtle pose
     // 1: Tilt (Eraserhead) ONLY
     // 2: Pan (Pencilnub) ONLY
@@ -143,10 +200,9 @@ void loop() {
     // 7: two step v 2 
     // 8: flipping out
 
+    // should probably refactor to switch/case one day
     //-------- 0: BE STILL / TURTLE POSE --------
     if (MODE == 0) {
-      // xGoalAngle = homePan;
-      // yGoalAngle = homeTilt-15;
       xGoalAngle = 0;
       yGoalAngle = 0;
     }
@@ -167,9 +223,11 @@ void loop() {
       }
 
       // change mode after certain time
-      if (lastUpdate > MODE_TS+8000) {
-        Serial.println("Mode change inside MODE 1");
-        newMode();
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+8000) {
+          Serial.println("Mode change inside MODE 1");
+          newMode();
+        }
       }
     }
 
@@ -191,9 +249,11 @@ void loop() {
       }
 
       // change mode after certain time
-      if (lastUpdate > MODE_TS+14000) {
-        Serial.println("Mode change inside MODE 2");
-        newMode();
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+14000) {
+          Serial.println("Mode change inside MODE 2");
+          newMode();
+        }
       }
 
     }
@@ -216,9 +276,11 @@ void loop() {
       }
 
       // change mode after certain time
-      if (lastUpdate > MODE_TS+8000) {
-        Serial.println("Mode change inside MODE 3");
-        newMode();
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+8000) {
+          Serial.println("Mode change inside MODE 3");
+          newMode();
+        }
       }
     }
 
@@ -240,9 +302,11 @@ void loop() {
       }
 
       // change mode after certain time
-      if (lastUpdate > MODE_TS+8000) {
-        Serial.println("Mode change inside MODE 4");
-        newMode();
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+8000) {
+          Serial.println("Mode change inside MODE 4");
+          newMode();
+        }
       }
     }
 
@@ -262,9 +326,11 @@ void loop() {
       }
 
       // change mode after certain time
-      if (lastUpdate > MODE_TS+5000) {
-        Serial.println("Mode change inside MODE 5");
-        newMode();
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+5000) {
+          Serial.println("Mode change inside MODE 5");
+          newMode();
+        }
       }
     }
 
@@ -302,9 +368,11 @@ void loop() {
       }
 
       // change mode after certain time
-      if (lastUpdate > MODE_TS+4000) {
-        Serial.println("Mode change inside MODE 6");
-        newMode();
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+4000) {
+          Serial.println("Mode change inside MODE 6");
+          newMode();
+        }
       }
     }
 
@@ -341,27 +409,18 @@ void loop() {
       }
 
       // change mode after certain time
-      if (lastUpdate > MODE_TS+4000) {
-        Serial.println("Mode change inside MODE 7");
-        newMode();
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+4000) {
+          Serial.println("Mode change inside MODE 7");
+          newMode();
+        }
       }
     }
   
     //-------- 8: flipping out --------
+    // actually just a faster version of MODE 7
     if (MODE == 8) {
-    //   if (counter%2 == 0) {
-    //     xGoalAngle = homePan-15;
-    //   }
-    //   if (counter%5 == 0) {
-    //     xGoalAngle = homePan+15;
-    //   }
-    //   if (counter % 5 == 0) {
-    //     yGoalAngle = homeTilt+15;
-    //   }
-    //   if (counter % 11 == 0) {
-    //     yGoalAngle = homeTilt;
-    //   }
-    // timing of wave
+
       if (counter%1 == 0) { 
         if (subWaveState) {
           if (waveState) {                
@@ -392,11 +451,13 @@ void loop() {
       }
 
       // be still 
-      if (lastUpdate > MODE_TS+1000) {
-        Serial.println("Mode change inside MODE 8");
-        MODE_LAST = MODE;
-        MODE = 0;
-        MODE_TS = lastUpdate;
+      if (MODE_AUTO) {
+        if (lastUpdate > MODE_TS+1000) {
+          Serial.println("Mode change inside MODE 8");
+          MODE_LAST = MODE;
+          MODE = 0;
+          MODE_TS = lastUpdate;
+        }
       }
     }
   }
@@ -408,23 +469,17 @@ long adjAngle(int servoNum, long angle) {
   //Serial.println("adjangle");
   switch (servoNum) {
     case 0: // Left Pan
-      // return map(angle, 0, 250, 0, 180);
       return angle;
     case 1: // Left Tilt
-      // return map(angle, 0, 180, 0, 180);
       return 180-angle;
   }
 }
 
 void newMode() {
-  if (MODE_AUTO) {
-    MODE_LAST = MODE;
-    MODE = getNewMode(sensorVal);
-    Serial.println(MODE);
-    MODE_TS = lastUpdate;
-  } else {
-    // do nothing
-  }
+  MODE_LAST = MODE;
+  MODE = getNewMode(sensorVal);
+  Serial.println(MODE);
+  MODE_TS = lastUpdate;
 }
 
 int getNewMode(int seedVal) {

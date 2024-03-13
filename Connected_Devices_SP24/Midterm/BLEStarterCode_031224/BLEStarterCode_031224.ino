@@ -35,6 +35,7 @@ BLEIntCharacteristic sensorCharacteristic(characteristicUUID, BLERead | BLEWrite
 //BLEByteCharacteristic testCharacteristic(characteristicUUID, BLERead | BLEWrite|  BLENotify); 
 
 // BLEStringCharacteristic modeCharacteristic(characteristicUUID, BLERead | BLEWrite|  BLENotify, 16); //strings of max length (change number to increase/decrease)
+BLEIntCharacteristic modeCharacteristic(characteristicUUID, BLERead | BLEWrite|  BLENotify); //strings of max length (change number to increase/decrease)
 
 int sensorPin = A6; // potentiometer wiper (middle terminal) connected to analog pin 3
                     // outside leads to ground and +5V
@@ -56,7 +57,8 @@ void setup() {
 
   BLE.setLocalName("TANG Arduino");
   BLE.setAdvertisedService(testService);
-  testService.addCharacteristic(sensorCharacteristic);
+  testService.addCharacteristic(modeCharacteristic);    // 0
+  testService.addCharacteristic(sensorCharacteristic);  // 1
   BLE.addService(testService);
   BLE.advertise();
 
@@ -78,19 +80,15 @@ void loop() {
     // Serial.println("test");
     digitalWrite(LED_BUILTIN, HIGH);
 
-    // write some stuff to your characteristics here
-    // make sure to use the correct data type!
-    // testCharacteristic.writeValue("hello");
-    sensorCharacteristic.writeValue(sensorVal);
-    // testCharacteristic.writeValue(true);
-    // tes|tCharacteristic.writeValue(String(555));
-    // testCharacteristic.writeValue(sensorVal);
+    // write to characteristic
+    sensorCharacteristic.writeValue(sensorVal);   // stream sensor unless impacting performance
+    modeCharacteristic.writeValue(millis());      // only write if changed
     
 
     // if characteristic has BLEWrite access:
-    if (sensorCharacteristic.written()) {
+    if (modeCharacteristic.written()) {
       // get the value here - make sure to use the correct data type!
-      int dataIn = testCharacteristic.value();
+      int dataIn = modeCharacteristic.value();
       Serial.println(dataIn);
     } else {
       digitalWrite(LED_BUILTIN, LOW);
