@@ -1,7 +1,7 @@
 let sensorCharacteristic;
 let modeCharacteristic;
 
-window.BLE = new p5ble();
+// window.BLE = new p5ble();
 
 // serviceUUID defined in config.js
 function BLEConnect() {BLE.connect(serviceUUID, handleBLEConnected)}
@@ -10,7 +10,7 @@ function handleBLEConnected(err, characteristics) {
     // console.log(characteristics);
     modeCharacteristic = characteristics[0];
     sensorCharacteristic = characteristics[1];
-    BLE.startNotifications(sensorCharacteristic, handleNewBLESensorValue);
+    // BLE.startNotifications(sensorCharacteristic, handleNewBLESensorValue);
     BLE.startNotifications(modeCharacteristic, handleNewBLEModeValue);
 }
 
