@@ -49,8 +49,14 @@ function handleNewBLESensorValue(value) {
 // send values back
 async function sendVal() {
     if (!modeCharacteristic) return;
-    await BLE.write(modeCharacteristic, (document.getElementById("send_value").value));
-    // document.getElementById("send_value").value = "";
+    let newMode = document.getElementById("send_value").value;
+    console.log(newMode);
+    newMode = parseInt(newMode);
+    console.log(newMode);
+    if (newMode >= 0 && newMode <= 8) {
+        await BLE.write(modeCharacteristic, newMode);
+        document.getElementById("send_value").value = ""; // clear field
+    }
 }
 
 function getTimestamp() {

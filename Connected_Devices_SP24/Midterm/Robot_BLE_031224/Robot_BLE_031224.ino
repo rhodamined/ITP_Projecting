@@ -131,8 +131,7 @@ void loop() {
       // if characteristic has BLEWrite access:
       if (modeCharacteristic.written()) {
         // get the value here - make sure to use the correct data type!
-        int dataIn = modeCharacteristic.value();
-        int val = parseForHumans(dataIn);
+        int val = modeCharacteristic.value();
         Serial.println(val);
         changeMode(val);
       } else {
@@ -350,23 +349,23 @@ void loop() {
           if (waveState) {                // UP
             //Serial.println("Up");
             xGoalAngle = homePan-40; 
-            Serial.println("1");
+            // Serial.println("1");
             delay(50);
           } else {                        // DOWN
             //Serial.println("down");
             xGoalAngle = homePan+40; 
-            Serial.println("3");
+            // Serial.println("3");
             delay(50);
           }
           subWaveState = false;
         } else if (!subWaveState) {
           if (waveState) {
             yGoalAngle = homeTilt+50;
-            Serial.println("2");
+            // Serial.println("2");
             delay(50);
           } else {
             yGoalAngle = homeTilt;
-            Serial.println("4");
+            // Serial.println("4");
             delay(50);
           }
           subWaveState = true;
@@ -526,10 +525,5 @@ int getNewMode(int seedVal) {
   } 
 }
 
-// I can't figure out byte arrays so fuck it
-// 0 is 48, etc
-int parseForHumans(int num) {
-  return abs(48-num);
-}
 
 
