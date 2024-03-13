@@ -1,19 +1,22 @@
+// BLUETOOTH
+let BLE;
 
+// BLOBS
+const blobs = [];
+let blobCounter = 0;
+
+// COLOR TRACKING FOR BLOBS
 let trackColor;
 let threshold = 90;
 let distThreshold = 50;
 
-const blobs = [];
-let blobCounter = 0;
-
-let videoReady = false;
-
-let BLE;
-
-// for selecting which webcam
+// VIDEO / WEBCAM
 let video;
+let videoReady = false;
 const devices = [];
 let chosenId = 2;
+
+
 
 async function preload() {
     console.log("preload");
@@ -31,13 +34,14 @@ async function preload() {
     frameRate(24);
   }
 
+
 async function setup() {
     BLE = new p5ble();
     createCanvas(640, 480);
     pixelDensity(1);
-    trackColor = color(0, 50, 200);
-    // video.hide();
+    trackColor = color(0, 50, 200); // hard-coded BLUE
 }
+
 
 function draw() {
     background(255);
@@ -79,49 +83,49 @@ function draw() {
     }
   
     for (let i = currentBlobs.length - 1; i >= 0; i--) {
-      if (currentBlobs[i].size() < 500) {
-        currentBlobs.splice(i, 1);
-      }
+        if (currentBlobs[i].size() < 500) {
+            currentBlobs.splice(i, 1);
+        }
     }
   
     // There are no blobs!
     if (blobs.length < 1 && currentBlobs.length > 0) {
-      print('Adding blobs!');
-      for (let b of currentBlobs) {
-        b.id = blobCounter;
-        blobs.push(b);
-        blobCounter++;
-      }
+        print('Adding blobs!');
+        for (let b of currentBlobs) {
+            b.id = blobCounter;
+            blobs.push(b);
+            blobCounter++;
+        }
     } else if (blobs.length <= currentBlobs.length) {
       // Match whatever blobs you can match
-      for (let b of blobs) {
-        let recordD = 1000;
-        let matched = null;
-        for (let cb of currentBlobs) {
-          let centerB = b.getCenter();
-          let centerCB = cb.getCenter();
-          const d = p5.Vector.dist(centerB, centerCB);
-          if (d < recordD && !cb.taken) {
-            recordD = d;
-            matched = cb;
-          }
+        for (let b of blobs) {
+            let recordD = 1000;
+            let matched = null;
+            for (let cb of currentBlobs) {
+            let centerB = b.getCenter();
+            let centerCB = cb.getCenter();
+            const d = p5.Vector.dist(centerB, centerCB);
+            if (d < recordD && !cb.taken) {
+                recordD = d;
+                matched = cb;
+            }
+            }
+            matched.taken = true;
+            b.become(matched);
         }
-        matched.taken = true;
-        b.become(matched);
-      }
   
-      // Whatever is leftover make new blobs
-      for (let b of currentBlobs) {
-        if (!b.taken) {
-          b.id = blobCounter;
-          blobs.push(b);
-          blobCounter++;
+        // Whatever is leftover make new blobs
+        for (let b of currentBlobs) {
+            if (!b.taken) {
+            b.id = blobCounter;
+            blobs.push(b);
+            blobCounter++;
+            }
         }
-      }
     } else if (blobs.length > currentBlobs.length) {
-      for (let b of blobs) {
-        b.taken = false;
-      }
+        for (let b of blobs) {
+            b.taken = false;
+        }
   
         // Match whatever blobs you can match
         for (let cb of currentBlobs) {
@@ -184,35 +188,7 @@ function distSq(a1, b1, c1, a2, b2, c2) {
     const d =
         (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z1 - z2) * (z1 - z2);
     return d;
-  }
-  
-  function mousePressed() {
-    // Save color where the mouse is clicked in trackColor variable
-    video.loadPixels();
-    const loc = (mouseX + mouseY * video.width) * 4;
-    trackColor = color(
-        video.pixels[loc],
-        video.pixels[loc + 1],
-        video.pixels[loc + 2]
-    );
-    console.log(trackColor);
-  }
-
-function keyPressed() {
-    if (key == 'a') {
-        distThreshold += 5;
-    } else if (key == 'z') {
-        distThreshold -= 5;
-    }
-    if (key == 's') {
-        threshold += 5;
-    } else if (key == 'x') {
-        threshold -= 5;
-    }
-    if (key == 'p') {
-        trackColor = color(0, 50, 200);
-    }
-  }
+}
 
 
 async function getDevices(deviceInfos) {
