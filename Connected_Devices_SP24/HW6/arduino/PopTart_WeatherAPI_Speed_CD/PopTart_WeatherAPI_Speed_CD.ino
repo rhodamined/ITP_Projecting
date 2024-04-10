@@ -32,7 +32,7 @@ bool SERVO_SERIAL = false; // turn on/off debugging for servo angles
 
 // Manage time
 long lastUpdate = 0;    // more forgiving but less precise than exact millis
-int stepRate = 70;
+int stepRate = 1000;
 
 //****** SETUP ******
 void setup() {
@@ -86,7 +86,7 @@ void loop() {
     // String postData = "{\"deviceID\": 1, \"value\": VALUE}"; //use single-quotes inside a JSON object literal
     // postData.replace("VALUE", String(millis())); //replace millis() with your own sensor data
     
-    char endpoint[] = "/textData?deviceID=jasparduino";
+    char endpoint[] = "/textData?deviceID=arduino_CT";
     client.post(endpoint, contentType, postData); //use client.put() to make a put request
 
     // read the status code and body of the response

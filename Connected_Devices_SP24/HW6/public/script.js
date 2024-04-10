@@ -29,13 +29,14 @@ function parseData(json) {
 
     console.log(json);
 
-    for (const e in json) { 
+    for (const dataPoint of json) {
+    // for (const e in json) { 
         // console.log(e);
 
-        for (const i in json[e]) {
-            console.log(json[e][i]);
+        // for (const i in json[e]) {
+            // console.log(json[e][i]);
 
-            const dataPoint = json[e][i];
+            // const dataPoint = json[e][i];
 
             const newRow = document.createElement("tr"); //create a new table row
     
@@ -49,7 +50,7 @@ function parseData(json) {
             newRow.appendChild(timeCell);
     
             document.getElementById("table_body").appendChild(newRow);
-        }
+        // }
     }
 }
 
