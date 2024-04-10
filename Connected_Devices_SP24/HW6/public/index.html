@@ -1,52 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+    <head>
+        <title>Fetch HTTP Example</title>
+    </head>
+    <body>
 
-    <title>Sketch</title>
+        <label>
+            Client ID: <input id="id_input"/>
+        </label>
+        <label>
+            Message: <input id="msg_input"/>
+        </label>
+        <button onClick="postData()">POST Data</button>
+        <br><br>
 
-    <script src="https://unpkg.com/p5ble@0.0.7/dist/p5.ble.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
-
-    <script src="libraries/p5.min.js"></script>
-    <!-- <script src="libraries/p5.sound.min.js"></script> -->
-  </head>
-
-  <body>
-
-    <!-- <button onClick="get()">BLE Connect</button>
-    <input id="send_value"/> -->
-    <!-- <button onClick="sendTxtVal()">Send text</button> -->
-    <script src="config.js"></script>
-
-    <div>
-
+        <label>
+            Client ID to get data: <input id="get_id_input"/>
+        </label>
+        <button onClick="getData()">GET Data</button>
+        <br><br>
+        
         <table>
-            <tr>
-                <td>
-                    <label for="post-color">POST color to server:</label>
-                </td>
-                <td>
-                    <input id="post-color-input"/>
-                    <button onClick="postColor()">POST</button>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="get-color">GET color from server:</label>
-                </td>
-                <td>
-                    <button onClick="getColor()">GET</button>
-                </td>
-            </tr>
+            <thead>
+                <th>Data</th>
+                <th>Time sent</th>
+            </thead>
+            <tbody id="table_body"></tbody>
         </table>
-    </div>
 
-
-    
-    <script src="ui.js"></script>
-    <script src="util.js"></script>
-    <script src="script.js"></script>
-  </body>
+        <script src="config.js"></script>
+        <script src="script.js"></script>
+        <script src="util.js"></script>
+    </body>
 </html>
