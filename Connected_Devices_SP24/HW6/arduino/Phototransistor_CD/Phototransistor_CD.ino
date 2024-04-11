@@ -1,4 +1,3 @@
-#include <Servo.h>
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
 #include "arduino_secrets.h"
@@ -78,15 +77,16 @@ void loop() {
     Serial.println("making POST request");
 
     //if sending raw text:
-    String contentType = "text/plain";
-    String postData = String(sensorVal);
+    // String contentType = "text/plain";
+    // String postData = String(sensorVal);
+    char endpoint[] = "/textData?deviceID=arduino_CT";
 
     //if sending a formatted JSON object (useful for updating multiple values)
-    // String contentType = "application/json"; //if sending a formatted JSON object
-    // String postData = "{\"deviceID\": 1, \"value\": VALUE}"; //use single-quotes inside a JSON object literal
-    // postData.replace("VALUE", String(millis())); //replace millis() with your own sensor data
+    String contentType = "application/json"; //if sending a formatted JSON object
+    String postData = "{\"deviceID\": 1, \"value\": VALUE}"; //use single-quotes inside a JSON object literal
+    postData.replace("VALUE", String(sensorVal)); //replace millis() with your own sensor data
     
-    char endpoint[] = "/textData?deviceID=arduino_CT";
+    // post
     client.post(endpoint, contentType, postData); //use client.put() to make a put request
 
     // read the status code and body of the response

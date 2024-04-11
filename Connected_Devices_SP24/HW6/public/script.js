@@ -27,30 +27,27 @@ async function getData() {
 function parseData(json) {
     document.getElementById("table_body").innerHTML = "";
 
-    console.log(json);
-
+    // read json into array
+    let arr = [];
     for (const dataPoint of json) {
-    // for (const e in json) { 
-        // console.log(e);
+        arr.push(dataPoint);
+    }
 
-        // for (const i in json[e]) {
-            // console.log(json[e][i]);
-
-            // const dataPoint = json[e][i];
-
-            const newRow = document.createElement("tr"); //create a new table row
+    // display most recent first
+    for (let i = arr.length-1; i >= 0; i--) {
+        let dataPoint = arr[i];
+        const newRow = document.createElement("tr"); //create a new table row
+        
+        const dataCell = document.createElement("td"); //create a new table cell
+        dataCell.innerHTML = dataPoint.data;
     
-            const dataCell = document.createElement("td"); //create a new table cell
-            dataCell.innerHTML = dataPoint.data;
+        const timeCell = document.createElement("td");
+        timeCell.innerHTML = new Date(dataPoint.timeSent).toString();
     
-            const timeCell = document.createElement("td");
-            timeCell.innerHTML = new Date(dataPoint.timeSent).toString();
+        newRow.appendChild(dataCell);
+        newRow.appendChild(timeCell);
     
-            newRow.appendChild(dataCell);
-            newRow.appendChild(timeCell);
-    
-            document.getElementById("table_body").appendChild(newRow);
-        // }
+        document.getElementById("table_body").appendChild(newRow);
     }
 }
 
@@ -60,41 +57,4 @@ async function getIDs() {
     //const body = await res.text() //if expecting a plain text response
     const body = await res.json();
     parseData(body);
-}
-
-
-// if your endpoint responds with JSON:
-async function getColor() {
-    console.log("getColor");
-    await fetch(urlGet)
-        .then(res => res.json())
-        .then(json => {
-            //do stuff with json here
-            let serverColor = json.msg;
-
-            // change color of html body to color received from server
-            document.body.style.backgroundColor = serverColor;
-        }
-    );
-}
-
-async function postColor() {
-    console.log("postColor");
-    //if posting raw text:
-    // let contentType = 'text/plain';
-    // let reqBody = document.getElementById("input").value;
-    
-    //if posting JSON:
-    let contentType = 'application/json';
-    let reqBody = JSON.stringify({msg: document.getElementById("post-color-input").value})
-    console.log(reqBody);
-
-    await fetch (urlPost, {
-        headers: {'Content-Type': contentType},
-        method: 'POST', //or use "PUT"
-        'body': reqBody
-    })
-    .then(res => {console.log(res.status)});
-
-    document.getElementById("post-color-input").value = "";
 }
