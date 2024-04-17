@@ -10,3 +10,9 @@ async function hideVideo() {
         vids.item(i).classList.add("hide");
     }
 }
+
+// get timestamp in human legible format
+function getTimestamp() {
+    let date = new Date();
+    return date.toLocaleTimeString();
+}

@@ -4,71 +4,75 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Sketch</title>
+    <title>Tide</title>
 
     <script src="https://unpkg.com/p5ble@0.0.7/dist/p5.ble.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="src/css/style.css">
 
     <script src="libraries/p5.min.js"></script>
     <!-- <script src="libraries/p5.sound.min.js"></script> -->
+    <script src="src/js/config.js"></script>
+    <script src="src/js/data.js"></script>
+    <script src="src/js/ble.js"></script>
   </head>
 
   <body>
 
-    <button onClick="BLEConnect()">BLE Connect</button>
-    <input id="send_value"/>
-    <button onClick="sendTxtVal()">Send text</button>
-    <script src="config.js"></script>
-    <script src="ble.js"></script>
-    <table>
-        <tr>
-            <th></th>
-            <th id="sensor_val_h">Sensor Value</th>
-            <th id="mode_val_h">Mode Value</th>
-        </tr>
-        <tr>
-            <th id="label_source">Source</th>
-            <td id="sensor_source">NA</td>
-            <td id="mode_source">NA</td>
-        </tr>
-        <tr>
-            <th id="label_timestamp">Timestamp</th>
-            <td id="sensor_timestamp">NA</td>
-            <td id="mode_timestamp">NA</td>
-        </tr>
-        <tr><th id="label_val">Value</th>
-            <td id="sensor_val">NA</td>
-            <td id="mode_val">NA</td>
-        </tr>
-        <tr>
-            <th id="label_detail">Detail</th>
-            <td id="sensor_detail">NA</td>
-            <td id="mode_detail">NA</td>
-        </tr>
-        <tr></tr>
-        <tr>
-            <th></th>
-            <th id="label_blob_id">ID</th>
-            <th id="label_x">X</th>
-            <th id="label_y">Y</th>
-        </tr>
-        <tr>
-            <th id="label_biggest_blob">Biggest Blob</th>
-            <td id="val_biggest_blob">NA</td>
-            <td id="x_biggest_blob">NA</td>
-            <td id="y_biggest_blob">NA</td>
-        </tr>
-        <tr>
-            <th id="label_status">Status</th>
-            <td></td>
-            <td id="x_status">NA</td>
-            <td id="y_status">NA</td>
-        </tr>
-    </table>
+    <div id="BLE_div">
+        <button onClick="BLEConnect()">BLE Connect</button>
+        <div id="BLE_status">
+            <h3>
+                Status: <span id="BLE_status_val">Unconnected</span>
+            </h3>
+        </div>
+    </div>
+
+    <div id="motor_div">
+        <table id="motor_tbl">
+            <tr>
+                <th id="motor_manual_th">
+                    <h3>Motor Speed: <span id="motor_spd_val">NA</span></h3>
+                    <div class="slidecontainer">
+                        <input type="range" min="1" max="100" value="50" class="slider" id="motor_spd_slider">
+                    </div>
+                </th>
+                <th id="motor_dir_th">
+                    <h3>Motor Direction: <span id="motor_dir_val">NA</span></h3>
+                    <button onClick="sendCWVal()">CW</button>
+                    <button onClick="sendCCWVal()">CCW</button>
+                    
+                </th>
+            </tr>
+        </table>
+    </div>
+
+    <br>
+    <br>
+    <div id="data_div">
+        <button onClick="updateData()">Update (Fetch)</button>
+        <button onClick="getWindData()">WIND update</button>
+        <table id="data_tbl">
+            <tr id="data_header_row">
+                <th id="ts_h">Update_TS</th>
+                <th id="tide_ts_h">Tide_TS</th>
+                <th id="tide_lvl_h">Tide_Level (m)</th>
+                <th id="wind_ts_h">Wind_TS</th>
+                <th id="wind_spd_h">Wind_Speed (mph)</th>
+                <th id="wind_dir_h">Wind_Dir (deg)</th>
+            </tr>
+            <tr id="data_val_row">
+                <td id="ts_val"></td>
+                <td id="tide_ts_val"></td>
+                <td id="tide_lvl_val"></td>
+                <td id="wind_ts_val"></td>
+                <td id="wind_spd_val"></td>
+                <td id="wind_dir_val"></td>
+            </tr>
+        </table>
+    </div>
+
     <div id="biggest_blob"></div>
-    <script src="ui.js"></script>
-    <script src="util.js"></script>
-    <script src="blobby.js"></script>
-    <script src="sketch.js"></script>
+    <script src="src/js/script.js"></script>
+    <script src="src/js/util.js"></script>
   </body>
 </html>
