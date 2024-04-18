@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DOG OSC</title>
+
+    <script src="https://unpkg.com/p5ble@0.0.7/dist/p5.ble.js"></script>
+    <link rel="stylesheet" type="text/css" href="src/css/style.css">
+
+    <script src="libraries/p5.min.js"></script>
+    <script src="libraries/node_modules/osc-js/lib/osc.js"></script>
+    <!-- <script src="libraries/p5.sound.min.js"></script> -->
+    <!-- <script src="src/js/config.js"></script>
+    <script src="src/js/osc_setup.js"></script>
+    <script src="src/js/script.js"></script> -->
+
+    <button id="send">Send Message</button>
+    <!-- <script type="text/javascript" src="lib/osc.min.js"></script> -->
+    <script type="text/javascript">
+      var osc = new OSC();
+      osc.open(); // connect by default to ws://localhost:8080
+
+      document.getElementById('send').addEventListener('click', () => {
+        var message = new OSC.Message('/test/random', Math.random());
+        osc.send(message);
+      });
+    </script>
+  </head>
+
+  <body>
+
+    <button onClick="getDog()">GET DOG</button>
+
+    <button onClick="oscA()">A</button>
+
+    <button onClick="oscB()">B</button>
+
+    <button onClick="oscC()">C</button>
+
+    <!-- <script src="src/js/util.js"></script> -->
+  </body>
+</html>

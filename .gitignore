@@ -29,3 +29,7 @@ old_ignore
 # configs
 config.h
 config.js
+
+package-lock.json
+node_modules
+

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sketch</title>
+
+    <script src="https://unpkg.com/p5ble@0.0.7/dist/p5.ble.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script src="libraries/p5.min.js"></script>
+    <!-- <script src="libraries/p5.sound.min.js"></script> -->
+  </head>
+
+  <body>
+
+    <!-- <button onClick="get()">BLE Connect</button>
+    <input id="send_value"/> -->
+    <!-- <button onClick="sendTxtVal()">Send text</button> -->
+    <script src="config.js"></script>
+
+    <div>
+        <input id="post-data-input"/>
+        <button onClick="postData()">POST</button>
+    </div>
+    <div>
+        <input id="post-ts-input"/>
+        <button onClick="postTimestamp()">POST</button>
+    </div>
+
+
+    <script src="ui.js"></script>
+    <script src="util.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
