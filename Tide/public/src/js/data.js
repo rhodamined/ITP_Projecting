@@ -1,9 +1,5 @@
 // API calls to get wind data, tide data
 
-const tide_url = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=latest&station=8518750&product=water_level&datum=MLLW&time_zone=lst&units=english&application=Tide_CT&format=json"
-const ow_url = "https://api.openweathermap.org/data/2.5/weather?lat=40.70&lon=-74.01&appid=ebae739ed4d57d1ebfdb118d3c8e96c0"
-
-
 let dat = {
     update_ts: "",
     tide_ts: "",
