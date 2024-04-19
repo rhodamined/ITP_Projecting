@@ -1,9 +1,5 @@
 String dataIn;
 
-String username = "Christina: ";
-
-int ledState = LOW;
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600); // uno only has 1 serial port
@@ -18,13 +14,12 @@ void loop() {
     Serial.println(dataIn);
     
     if (dataIn == "1") {
-      Serial.println("LED is ON");
-      // ledState = !ledState;
+      // Serial.println("LED is ON");
       digitalWrite(13, HIGH);
     } 
     
     else if (dataIn == "0") {
-      Serial.println("LED is OFF");
+      // Serial.println("LED is OFF");
       digitalWrite(13, LOW);
     }
 
