@@ -97,9 +97,12 @@ void loop() {
     dataIn = Serial.parseInt();
     Serial.println(dataIn);
 
-    if (dataIn = 1) {
+    if (dataIn == 1) {
       Serial.println("yay");
       digitalWrite(out5, HIGH);
+    } else if (dataIn == 0) {
+      Serial.println("boo");
+      digitalWrite(out5, LOW);
     }
   }
 

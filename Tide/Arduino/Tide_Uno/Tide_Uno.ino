@@ -47,9 +47,11 @@ void loop()
 
   if (pinArr[5]== HIGH) {
     digitalWrite(13, HIGH);
+    stepper.setSpeed(0);
   } 
   else if (pinArr[5] == LOW) {
     digitalWrite(13, LOW);
+    stepper.setSpeed(200);
   }
 
   stepper.runSpeed();
