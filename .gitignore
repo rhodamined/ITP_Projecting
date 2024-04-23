@@ -29,6 +29,7 @@ old_ignore
 # configs
 config.h
 config.js
+arduino_secrets.h
 
 package-lock.json
 node_modules
