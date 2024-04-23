@@ -9,10 +9,7 @@ const int enPin = 10;
 // Creates an instance - Pick the version you want to use and un-comment it. That's the only required change.
 AccelStepper stepper(AccelStepper::DRIVER, stepPin, dirPin);
 
-
-// Serial!
-String dataIn;
-
+// in pins for commmunicating with Nano 33 IOT
 int in0 = 2;
 int in1 = 3; 
 int in2 = 4;
@@ -20,16 +17,18 @@ int in3 = 5;
 int in4 = 6;
 int in5 = 7;
 
+// to store all in pin data
 int pinArr[6];
+
+// i
 
 void setup()
 {  
-
   Serial.begin(9600);
   // Change these to suit your stepper if you want
-  stepper.setMaxSpeed(1000);
+  stepper.setMaxSpeed(2000); // can go VERY fast, this is probably the cap
   stepper.setAcceleration(100);
-  stepper.moveTo(500);
+  stepper.setSpeed(200); // slowest should be 40...
 
   pinMode(in0, INPUT);
   pinMode(in1, INPUT);
@@ -47,18 +46,13 @@ void loop()
   // printArr();
 
   if (pinArr[5]== HIGH) {
-    Serial.println("high");
     digitalWrite(13, HIGH);
   } 
   else if (pinArr[5] == LOW) {
     digitalWrite(13, LOW);
   }
 
-  // If at the end of travel go to the other end
-  if (stepper.distanceToGo() == 0)
-    stepper.moveTo(-stepper.currentPosition());
- 
-  stepper.run();
+  stepper.runSpeed();
 }
 
 // read 6 pins
