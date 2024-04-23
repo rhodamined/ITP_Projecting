@@ -9,7 +9,7 @@ char ssid[] = SECRET_SSID;
 char pass[] = SECRET_PASS;
 
 // DNS alias doesn't work -- needs to be heroku endpoint TT^TT
-const char serverAddress[] = "tide-itp-021c79318fab.herokuapp.com";  // server address
+const char serverAddress[] = SECRET_ADDRESS;  // server address
 int port = 443;
 
 WiFiSSLClient wifi;
@@ -46,6 +46,8 @@ int receivedMotorSpd;
 int receivedMotorDir;
 int motorSpd;
 int motorDir;
+
+int dataIn;
 
 void setup() {
   // Serial
@@ -87,13 +89,23 @@ void loop() {
       }
     }
   }
-
   // set the LED:
   digitalWrite(13, ledState);
 
+  if (Serial.available() > 0) { // usb
+
+    dataIn = Serial.parseInt();
+    Serial.println(dataIn);
+
+    if (dataIn = 1) {
+      Serial.println("yay");
+      digitalWrite(out5, HIGH);
+    }
+  }
+
 }
 
-void getData() {
+bool getData() {
   // assemble the path for the GET message:
   String path = "/x88uv9"; // this endpoint sends motorspd, motordir
   String contentType = "application/json";
@@ -131,6 +143,11 @@ void getData() {
     Serial.println(receivedMotorSpd);
     Serial.print("Received Motor Dir: ");
     Serial.println(receivedMotorDir);
+
+    return true;
+  } 
+  else {
+    return false;
   }
 }
 
