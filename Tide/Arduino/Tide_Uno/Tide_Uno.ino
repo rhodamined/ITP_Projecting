@@ -1,3 +1,5 @@
+#include <ArduinoDMX.h>
+
 // Include the AccelStepper Library
 #include <AccelStepper.h>
 
@@ -26,9 +28,9 @@ void setup()
 {  
   Serial.begin(9600);
   // Change these to suit your stepper if you want
-  stepper.setMaxSpeed(2000); // can go VERY fast, this is probably the cap
+  stepper.setMaxSpeed(8000); // can go VERY fast, this is probably the cap
   stepper.setAcceleration(100);
-  stepper.setSpeed(200); // slowest should be 40...
+  stepper.setSpeed(250); // slowest should be 40...
 
   pinMode(in0, INPUT);
   pinMode(in1, INPUT);
@@ -47,11 +49,11 @@ void loop()
 
   if (pinArr[5]== HIGH) {
     digitalWrite(13, HIGH);
-    stepper.setSpeed(0);
+    stepper.setSpeed(-250);
   } 
   else if (pinArr[5] == LOW) {
     digitalWrite(13, LOW);
-    stepper.setSpeed(200);
+    stepper.setSpeed(250);
   }
 
   stepper.runSpeed();
