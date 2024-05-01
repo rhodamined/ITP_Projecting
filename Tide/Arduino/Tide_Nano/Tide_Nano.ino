@@ -1,5 +1,7 @@
 #include <ArduinoHttpClient.h>
 #include <WiFiNINA.h>
+#include <elapsedMillis.h>
+#include <Bounce2.h>
 #include "arduino_secrets.h"
 
 // ---------------
@@ -32,11 +34,14 @@ int out5 = 7;
 // Button
 // ---------------
 int ledState = HIGH;        // the current state of the output pin
-int buttonState;            // the current reading from the input pin
-int lastButtonState = LOW;  // the previous reading from the input pin
+int buttonPin = 21;
+Bounce2::Button button = Bounce2::Button(); // INSTANTIATE A Bounce2::Button OBJECT
 
-unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-unsigned long debounceDelay = 30;  
+// ---------------
+// Time-keeping
+// ---------------
+
+elapsedMillis clock;
 
 // ---------------
 // Global Vars
@@ -56,8 +61,6 @@ int motorDir;
 
 int motorPins[6];
 
-// testing only
-int dataIn;
 
 bool REST_SUCCESS;
 
@@ -68,9 +71,13 @@ void setup() {
   // Wifi
   connectWifi();
 
-  // Test only
-  pinMode(13, OUTPUT); // led
-  pinMode(21, INPUT); // button
+  // LED
+  pinMode(13, OUTPUT);
+
+  // Button
+  button.attach(buttonPin, INPUT);
+  button.interval(30);
+  button.setPressedState(HIGH); 
 
   // to Arduino UNO
   pinMode(out0, OUTPUT);  // Motor DIRECTION
@@ -80,32 +87,23 @@ void setup() {
   pinMode(out4, OUTPUT);
   pinMode(out5, OUTPUT);
 
+  REST_SUCCESS = getData();
+    
+  if (REST_SUCCESS == true) {
+    parseData();
+  }
+
 }
 
 void loop() {
 
-  // make API call, update receivedMotorSpd and receivedMotorDir
-  REST_SUCCESS = getData();
-
-  // Update states
-  if (REST_SUCCESS == true) {
+  // make API call every 10 minutes
+  if (clock > 600000) {
+    REST_SUCCESS = getData();
     
-    // clean garbage speeds
-    if (receivedMotorSpd <= motorSpdMax && receivedMotorSpd >= motorSpdMin) {
-      motorSpd = receivedMotorSpd;
-      Serial.print("Motor speed: ");
-      Serial.println(motorSpd);
+    if (REST_SUCCESS == true) {
+      parseData();
     }
-
-    // clean garbage dir
-    if (receivedMotorDir == 0 || receivedMotorDir == 1) {
-      motorDir = receivedMotorDir;
-      Serial.print("Motor dir: ");
-      Serial.println(motorDir);
-    }
-    
-    // parse to pin states
-    parseData();
   }
 
   // send to Uno 
@@ -116,28 +114,13 @@ void loop() {
   digitalWrite(out4, motorPins[4]);
   digitalWrite(out5, motorPins[5]);
 
-  Serial.println("Waiting 10 minutes...");
-  // wait 10 minutes lol
-  delay(600000);
-
-
-
-  // ---- BUTTON NONSENSE ----
-  // Button reading
-  int reading = digitalRead(21);
-
-  // Button is a test
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    if (reading != buttonState) {
-      buttonState = reading;
-
-      if (buttonState == HIGH) {
-        ledState = !ledState;
-        getData();
-      }
-    }
+  // READ BUTTON
+  button.update();
+  if ( button.pressed() ) {
+    // DO SOMETHING IF THE BUTTON WAS PRESSED THIS LOOP...
+    Serial.println("Button Pushed");
+    ledState = !ledState;
   }
-  // set the LED:
   digitalWrite(13, ledState);
 
 }
@@ -191,6 +174,20 @@ bool getData() {
 void parseData() {
 
   Serial.println("function: parseData");
+
+  // clean garbage speeds
+    if (receivedMotorSpd <= motorSpdMax && receivedMotorSpd >= motorSpdMin) {
+      motorSpd = receivedMotorSpd;
+      Serial.print("Motor speed: ");
+      Serial.println(motorSpd);
+    }
+
+  // clean garbage dir
+  if (receivedMotorDir == 0 || receivedMotorDir == 1) {
+    motorDir = receivedMotorDir;
+    Serial.print("Motor dir: ");
+    Serial.println(motorDir);
+  }
 
   // divide max-min by 32 bits
   // auto floors bc int
