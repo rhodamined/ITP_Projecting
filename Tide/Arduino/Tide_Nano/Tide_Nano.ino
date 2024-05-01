@@ -30,21 +30,22 @@ int out3 = 5;
 int out4 = 6;
 int out5 = 7;
 
-// ---------------
-// Button
-// ---------------
-int ledState = HIGH;        // the current state of the output pin
+// ------------------------
+// Button & State tracking
+// ----------------------
 int buttonPin = 21;
 Bounce2::Button button = Bounce2::Button(); // INSTANTIATE A Bounce2::Button OBJECT
+int ledState = HIGH;        // tester for button & mode
+int MODE = HIGH;        // HIGH: poll real-time data
+                        // HIGH: poll manual web data
 
 // ---------------
 // Time-keeping
 // ---------------
-
 elapsedMillis clock;
 
 // ---------------
-// Global Vars
+// Motors....
 // ---------------
 
 // manually set min and max -- should reflect node.js
@@ -59,6 +60,7 @@ int receivedMotorDir;
 int motorSpd;
 int motorDir;
 
+// to send to Uno
 int motorPins[6];
 
 
@@ -87,6 +89,8 @@ void setup() {
   pinMode(out4, OUTPUT);
   pinMode(out5, OUTPUT);
 
+
+  // make initial API call
   REST_SUCCESS = getData();
     
   if (REST_SUCCESS == true) {
@@ -97,16 +101,48 @@ void setup() {
 
 void loop() {
 
-  // make API call every 10 minutes
-  if (clock > 600000) {
+  // Read button
+  button.update();
+  if ( button.pressed() ) {
+
+    Serial.println("Button Pushed");
+    ledState = !ledState;
+    MODE = !MODE;
+
+    Serial.print("Mode: ");
+    Serial.println(MODE);
+
     REST_SUCCESS = getData();
-    
+      
+    // only process if api call successful
     if (REST_SUCCESS == true) {
+      Serial.println("success");
       parseData();
+      clock = 0;
     }
   }
 
-  // send to Uno 
+  // make API call every 10 minutes
+  if (MODE == 1) {
+    if (clock > 600000) {
+      REST_SUCCESS = getData();
+      
+      // only process if api call successful
+      if (REST_SUCCESS == true) {
+        parseData();
+      }
+      clock = 0; // remember to reset!
+    }
+  }
+
+  if (MODE == 0) {
+    if (clock > 5000) {
+      Serial.println("blah blah blah");
+      clock = 0;
+    }
+  }
+
+  // Send to Uno 
   digitalWrite(out0, motorPins[0]);
   digitalWrite(out1, motorPins[1]);
   digitalWrite(out2, motorPins[2]);
@@ -114,21 +150,23 @@ void loop() {
   digitalWrite(out4, motorPins[4]);
   digitalWrite(out5, motorPins[5]);
 
-  // READ BUTTON
-  button.update();
-  if ( button.pressed() ) {
-    // DO SOMETHING IF THE BUTTON WAS PRESSED THIS LOOP...
-    Serial.println("Button Pushed");
-    ledState = !ledState;
-  }
+  // update LED lol
   digitalWrite(13, ledState);
 
 }
 
 bool getData() {
   // assemble the path for the GET message:
-  String path = "/x88uv9"; // this endpoint sends motorspd, motordir
+
+  String path;
   String contentType = "application/json";
+
+  if (MODE == HIGH) { // default
+    path = "/x88uv9"; // this endpoint sends realtime data mapped motorspd, motordir
+  } else {
+    path = "/v89sd0"; // this endpoint sends manual data from website
+  }
+  
   
   // send the GET request
   Serial.println("making GET request");
@@ -173,7 +211,7 @@ bool getData() {
 
 void parseData() {
 
-  Serial.println("function: parseData");
+  Serial.println("Function: parseData");
 
   // clean garbage speeds
     if (receivedMotorSpd <= motorSpdMax && receivedMotorSpd >= motorSpdMin) {
