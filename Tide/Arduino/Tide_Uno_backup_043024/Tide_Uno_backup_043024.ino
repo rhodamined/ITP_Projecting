@@ -1,3 +1,5 @@
+#include <ArduinoDMX.h>
+
 // Include the AccelStepper Library
 #include <AccelStepper.h>
 
@@ -20,30 +22,15 @@ int in5 = 7;
 // to store all in pin data
 int pinArr[6];
 
-// ---------------
-// Motors Setup
-// ---------------
-
-// manually set min and max -- should reflect node.js
-int motorSpdMax = 2000;
-int motorSpdMin = 40;
-int motorStep = (motorSpdMax - motorSpdMin)/ 32;
-
-int motorDir = 1; // Nano sends motorDir as 0 or 1
-                  // Uno uses +1 or -1 as multiplier for spd
-
-int spd_last = 250;
-int spd = spd_last;
-int spd_binary = 0;
-
+// i
 
 void setup()
 {  
   Serial.begin(9600);
   // Change these to suit your stepper if you want
-  stepper.setMaxSpeed(1000); // can go VERY fast, this is probably the cap
+  stepper.setMaxSpeed(8000); // can go VERY fast, this is probably the cap
   stepper.setAcceleration(100);
-  stepper.setSpeed(spd_last); // slowest should be 40...
+  stepper.setSpeed(250); // slowest should be 40...
 
   pinMode(in0, INPUT);
   pinMode(in1, INPUT);
@@ -56,16 +43,18 @@ void setup()
  
 void loop()
 {
+
   readPins();
-  parseFromBinary();
+  // printArr();
 
-  spd = motorDir*(spd_binary * motorStep + motorSpdMin);
-
-  if (spd != spd_last) {
-    stepper.setSpeed(spd);
-    spd_last = spd;
+  if (pinArr[5]== HIGH) {
+    digitalWrite(13, HIGH);
+    stepper.setSpeed(-250);
+  } 
+  else if (pinArr[5] == LOW) {
+    digitalWrite(13, LOW);
+    stepper.setSpeed(250);
   }
-  Serial.println(spd);
 
   stepper.runSpeed();
 }
@@ -82,21 +71,6 @@ void readPins() {
   pinArr[4] = digitalRead(in4);
   pinArr[5] = digitalRead(in5);
 
-}
-
-void parseFromBinary() {
-
-  if (pinArr[0] == 1) {
-    motorDir = 1;
-  } else {
-    motorDir = -1;
-  }
-
-  bitWrite(spd_binary, 0, pinArr[1]);
-  bitWrite(spd_binary, 1, pinArr[2]);
-  bitWrite(spd_binary, 2, pinArr[3]);
-  bitWrite(spd_binary, 3, pinArr[4]);
-  bitWrite(spd_binary, 4, pinArr[5]);
 }
 
 void printArr() {

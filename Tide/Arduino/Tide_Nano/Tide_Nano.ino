@@ -35,6 +35,7 @@ int out5 = 7;
 // ----------------------
 int buttonPin = 21;
 Bounce2::Button button = Bounce2::Button(); // INSTANTIATE A Bounce2::Button OBJECT
+int ledPin = 13;
 int ledState = HIGH;        // tester for button & mode
 int MODE = HIGH;        // HIGH: poll real-time data
                         // HIGH: poll manual web data
@@ -49,7 +50,7 @@ elapsedMillis clock;
 // ---------------
 
 // manually set min and max -- should reflect node.js
-int motorSpdMax = 1000;
+int motorSpdMax = 2000;
 int motorSpdMin = 40;
 
 // received data from web call
@@ -74,7 +75,7 @@ void setup() {
   connectWifi();
 
   // LED
-  pinMode(13, OUTPUT);
+  pinMode(ledPin, OUTPUT);
 
   // Button
   button.attach(buttonPin, INPUT);
@@ -108,6 +109,7 @@ void loop() {
     Serial.println("Button Pushed");
     ledState = !ledState;
     MODE = !MODE;
+    digitalWrite(ledPin, ledState);
 
     Serial.print("Mode: ");
     Serial.println(MODE);
@@ -137,7 +139,13 @@ void loop() {
 
   if (MODE == 0) {
     if (clock > 5000) {
-      Serial.println("blah blah blah");
+      REST_SUCCESS = getData();
+      
+      // only process if api call successful
+      if (REST_SUCCESS == true) {
+        parseData();
+      }
+      
       clock = 0;
     }
   }
@@ -151,7 +159,7 @@ void loop() {
   digitalWrite(out5, motorPins[5]);
 
   // update LED lol
-  digitalWrite(13, ledState);
+  digitalWrite(ledPin, ledState);
 
 }
 
@@ -259,7 +267,7 @@ void parseData() {
 
 void connectWifi() {
   
-  while (!Serial);
+  // while (!Serial);
   while ( status != WL_CONNECTED) {
     Serial.print("Attempting to connect to Network named: ");
     Serial.println(ssid);     // print the network name (SSID);
