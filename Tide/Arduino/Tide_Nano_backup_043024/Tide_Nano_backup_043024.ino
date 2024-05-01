@@ -43,7 +43,7 @@ unsigned long debounceDelay = 30;
 // ---------------
 
 // manually set min and max -- should reflect node.js
-int motorSpdMax = 1000;
+int motorSpdMax = 2000;
 int motorSpdMin = 40;
 
 // received data from web call
@@ -54,12 +54,8 @@ int receivedMotorDir;
 int motorSpd;
 int motorDir;
 
-int motorPins[6];
-
 // testing only
 int dataIn;
-
-bool REST_SUCCESS;
 
 void setup() {
   // Serial
@@ -84,50 +80,11 @@ void setup() {
 
 void loop() {
 
-  // make API call, update receivedMotorSpd and receivedMotorDir
-  REST_SUCCESS = getData();
-
-  // Update states
-  if (REST_SUCCESS == true) {
-    
-    // clean garbage speeds
-    if (receivedMotorSpd <= motorSpdMax && receivedMotorSpd >= motorSpdMin) {
-      motorSpd = receivedMotorSpd;
-      Serial.print("Motor speed: ");
-      Serial.println(motorSpd);
-    }
-
-    // clean garbage dir
-    if (receivedMotorDir == 0 || receivedMotorDir == 1) {
-      motorDir = receivedMotorDir;
-      Serial.print("Motor dir: ");
-      Serial.println(motorDir);
-    }
-    
-    // parse to pin states
-    parseData();
-  }
-
-  // send to Uno 
-  digitalWrite(out0, motorPins[0]);
-  digitalWrite(out1, motorPins[1]);
-  digitalWrite(out2, motorPins[2]);
-  digitalWrite(out3, motorPins[3]);
-  digitalWrite(out4, motorPins[4]);
-  digitalWrite(out5, motorPins[5]);
-
-  Serial.println("Waiting 10 minutes...");
-  // wait 10 minutes lol
-  delay(600000);
-
-
-
-  // ---- BUTTON NONSENSE ----
-  // Button reading
   int reading = digitalRead(21);
 
   // Button is a test
   if ((millis() - lastDebounceTime) > debounceDelay) {
+
     if (reading != buttonState) {
       buttonState = reading;
 
@@ -139,6 +96,21 @@ void loop() {
   }
   // set the LED:
   digitalWrite(13, ledState);
+
+  // testing only
+  if (Serial.available() > 0) { // usb
+
+    dataIn = Serial.parseInt();
+    Serial.println(dataIn);
+
+    if (dataIn == 1) {
+      Serial.println("yay");
+      digitalWrite(out5, HIGH);
+    } else if (dataIn == 0) {
+      Serial.println("boo");
+      digitalWrite(out5, LOW);
+    }
+  }
 
 }
 
@@ -186,39 +158,6 @@ bool getData() {
   else {
     return false;
   }
-}
-
-void parseData() {
-
-  Serial.println("function: parseData");
-
-  // divide max-min by 32 bits
-  // auto floors bc int
-  int motorStep = (motorSpdMax - motorSpdMin)/ 32;
-
-  // dumb way to handle range being 0-31
-  if (motorSpd == motorSpdMax) {
-    motorSpd--;
-  }
-
-  // speed as a int from 0 to 31
-  int spd = (receivedMotorSpd - motorSpdMin) / motorStep;
-  Serial.print("Speed out of 32: ");
-  Serial.println(spd);
-
-  // update pinStates
-  motorPins[0] = receivedMotorDir; // should be received as 1 or 0
-  motorPins[1] = bitRead(spd, 0);
-  motorPins[2] = bitRead(spd, 1);
-  motorPins[3] = bitRead(spd, 2);
-  motorPins[4] = bitRead(spd, 3);
-  motorPins[5] = bitRead(spd, 4); // dumb dumb dumb
-
-  // print binary for idiot check
-  for (int i = 0; i < 6; i++) {
-    Serial.print(motorPins[i]);
-  }
-  Serial.println("\n");
 }
 
 
