@@ -1,8 +1,5 @@
 // Include the AccelStepper Library
 #include <AccelStepper.h>
-// DMX library "dmxlibraryforar" for DMX Shield
-#include <Conceptinetics.h>
-
 
 // Motor Connections (constant current, step/direction bipolar motor driver)
 const int stepPin = 12;
