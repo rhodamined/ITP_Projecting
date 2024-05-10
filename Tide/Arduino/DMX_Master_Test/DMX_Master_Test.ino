@@ -16,10 +16,14 @@ DMX_Master dmx_master ( DMX_MASTER_CHANNELS, RXEN_PIN );
 int minDMX = 0;
 int maxDMX = 255;
 int maxChannels = DMX_MASTER_CHANNELS;
-int phasePeriod = 10000;
+int phasePeriod = 20000;
+int phaseStep = phasePeriod / maxChannels;
+int allDMXValues[16];
 
 // the setup routine runs once when you press reset:
-void setup() {             
+void setup() {    
+
+  // can only do serial OR DMX send....         
   // Serial.begin(9600);
   
   // Enable DMX master interface and start transmitting
@@ -34,28 +38,54 @@ void loop()
 {
   static int dimmer_val;
 
-  // calculate vals
+  // calculate DMX vals
+  double mod = millis() % phasePeriod;
+
   for (int i = 1; i <= maxChannels; i++) {
-
-    double mod = millis() % phasePeriod;
-    double a = dblmap(mod, 0, phasePeriod-1, 0, TWO_PI);
-    double lvl = dblmap(sin(a) + 1, 0, 2, minDMX, maxDMX);
-
-    // Serial.print(mod);
-    // Serial.print("\t");
-    // Serial.print(a);
-    // Serial.print("\t");
-    // Serial.println(lvl);
-
-    dmx_master.setChannelValue( i, lvl );
+    allDMXValues[i-1] = getDMXValue(mod, i);
   }
   
-  // send Vals  
-  
+  // send DMX values
+  for (int i = 1; i <= maxChannels; i++) {
+    int lvl = allDMXValues[i-1];
+    dmx_master.setChannelValue( i, lvl );
+
+    // Print DMX values
+    // Serial.print(allDMXValues[i-1]);
+    // Serial.print("\t");
+    // if (i == 16) {
+    //   Serial.println("\n");
+    // }
+  }
+
+
   delay ( 10 );
 }
 
 // custome map function for doubles; arduino library map uses long, but we need decimals for MATH
 double dblmap(double x, double in_min, double in_max, double out_min, double out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+int getDMXValue(int mod, int chan) {
+
+  // offset by channel using time -- easier for my brain than radians
+  int newMod = (mod + (phaseStep*chan)) % phasePeriod;
+
+  // remap place in phase to period of sin(x), which is 2PI
+  double rad = dblmap(newMod, 0, phasePeriod-1, 0, TWO_PI);
+
+  // remap radians to level
+  double lvl = dblmap(sin(rad) + 1, 0, 2, minDMX, maxDMX);
+
+  // Serial.print(mod);
+  // Serial.print("\t");
+  // Serial.print(newMod);
+  // Serial.print("\t");
+  
+  // Serial.print(rad);
+  // Serial.print("\t");
+  // Serial.println(lvl);
+
+  return (int)lvl;
 }
