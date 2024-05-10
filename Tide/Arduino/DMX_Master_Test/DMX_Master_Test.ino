@@ -16,7 +16,7 @@ DMX_Master dmx_master ( DMX_MASTER_CHANNELS, RXEN_PIN );
 int minDMX = 0;
 int maxDMX = 255;
 int maxChannels = DMX_MASTER_CHANNELS;
-int phasePeriod = 20000;
+int phasePeriod = 10000;
 int phaseStep = phasePeriod / maxChannels;
 int allDMXValues[16];
 
@@ -36,7 +36,6 @@ void setup() {
 // the loop routine runs over and over again forever:
 void loop() 
 {
-  static int dimmer_val;
 
   // calculate DMX vals
   double mod = millis() % phasePeriod;
