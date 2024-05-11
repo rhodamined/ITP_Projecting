@@ -29,7 +29,7 @@ int pinArr[6];
 // manually set min and max -- should reflect node.js
 int motorSpdMax = 2000;
 int motorSpdMin = 40;
-int motorStep = (motorSpdMax - motorSpdMin)/ 32;
+int motorStep = (motorSpdMax - motorSpdMin)/ 32; //32 i.e. 5 bits
 
 int motorDir = 1; // Nano sends motorDir as 0 or 1
                   // Uno uses +1 or -1 as multiplier for spd
@@ -50,7 +50,7 @@ DMX_Master dmx_master ( DMX_MASTER_CHANNELS, RXEN_PIN );
 int minDMX = 0;
 int maxDMX = 255;
 int maxChannels = DMX_MASTER_CHANNELS;
-int phasePeriod = 10000;
+int phasePeriod = 20000;
 int phaseStep = phasePeriod / maxChannels;
 int allDMXValues[16];
 
@@ -93,7 +93,6 @@ void loop()
 
   // calculate DMX vals
   double mod = millis() % phasePeriod;
-
   for (int i = 1; i <= maxChannels; i++) {
     allDMXValues[i-1] = getDMXValue(mod, i);
   }
@@ -102,13 +101,6 @@ void loop()
   for (int i = 1; i <= maxChannels; i++) {
     int lvl = allDMXValues[i-1];
     dmx_master.setChannelValue( i, lvl );
-
-    // Print DMX values
-    // Serial.print(allDMXValues[i-1]);
-    // Serial.print("\t");
-    // if (i == 16) {
-    //   Serial.println("\n");
-    // }
   }
 
   stepper.runSpeed();
@@ -143,15 +135,6 @@ void parseFromBinary() {
   bitWrite(spd_binary, 4, pinArr[5]);
 }
 
-void printArr() {
-  for (int i = 0; i < 5; i++) {
-    // Serial.print(pinArr[i]);
-    // Serial.print(", ");
-  }
-  // Serial.println(pinArr[5]);
-}
-
-
 
 // custome map function for doubles; arduino library map uses long, but we need decimals for MATH
 double dblmap(double x, double in_min, double in_max, double out_min, double out_max) {
@@ -180,4 +163,27 @@ int getDMXValue(int mod, int chan) {
 
   return (int)lvl;
 }
+
+
+// PRINT FUNCTIONS
+// CAN'T HAVE SERIAL WITH DMX
+/**
+void printArr() {
+  for (int i = 0; i < 5; i++) {
+    Serial.print(pinArr[i]);
+    Serial.print(", ");
+  }
+  Serial.println(pinArr[5]);
+}
+
+void printDMX() {
+  for (int i = 1; i <= maxChannels; i++) {
+    Serial.print(allDMXValues[i-1]);
+    Serial.print("\t");
+    if (i == 16) {
+      Serial.println("\n");
+    }
+  }
+}
+**/
 
