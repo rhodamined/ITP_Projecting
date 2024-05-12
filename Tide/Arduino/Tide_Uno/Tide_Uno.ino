@@ -52,6 +52,8 @@ int maxDMX = 255;
 int maxChannels = DMX_MASTER_CHANNELS;
 int phasePeriod = 20000;
 int phaseStep = phasePeriod / maxChannels;
+int phasePeriodMax = 5000;
+int phasePeriodMin = 30000;
 int allDMXValues[16];
 
 
@@ -83,7 +85,9 @@ void loop()
   readPins();
   parseFromBinary();
 
-  spd = motorDir*(spd_binary * motorStep + motorSpdMin);
+  // spd = motorDir*(spd_binary * motorStep + motorSpdMin);
+  spd = (spd_binary * motorStep + motorSpdMin);
+  phasePeriod = map(spd, motorSpdMin, motorSpdMax, phasePeriodMin, phasePeriodMax);
 
   if (spd != spd_last) {
     stepper.setSpeed(spd);

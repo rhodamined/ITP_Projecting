@@ -50,7 +50,7 @@ elapsedMillis clock;
 // ---------------
 
 // manually set min and max -- should reflect node.js
-int motorSpdMax = 2000;
+int motorSpdMax = 1600;
 int motorSpdMin = 40;
 
 // received data from web call
