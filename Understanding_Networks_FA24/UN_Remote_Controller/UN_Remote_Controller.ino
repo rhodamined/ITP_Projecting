@@ -63,20 +63,26 @@ void setup() {
 }
 
 void loop() {
-  // update 
+  // do things
   updateButtonStates();
 
+  // manage LEDs
   if (client.connected()) {
     digitalWrite(yellowLedPin, HIGH);  // yellow indic light off once client connected
   } else {
     digitalWrite(yellowLedPin, LOW);  // yellow indic light off once client disconnected
   }
 
+  // slight debounce
   delay(50);
 
 }
 
 // this has been brute forced lol
+// reads current button states 
+// compares to a 'last' button state to decide if a new button has been pressed
+// when a new button has been pressed, 'pushes' new button to lastFive array (but it actually addes it to index 0)
+// this only tracks state changes, what happens is dictated by pushLastFive()
 void updateButtonStates() {
 
   // 0
@@ -163,6 +169,7 @@ void printCurrentState() {
   Serial.println();
 }
 
+// for visualizing -- last five button presses
 void printLastFive() {
   for (int i = 0; i < totalButtons; i++) {
     Serial.print(lastFive[i]); Serial.print(',');
@@ -170,6 +177,8 @@ void printLastFive() {
   Serial.println();
 }
 
+
+// this actually manages what happens with every 'new' button press
 void pushLastFive(int newNumber) {
   for (int i = totalButtons; i >= 0; i--) {
     if (i == 0) {
@@ -179,13 +188,9 @@ void pushLastFive(int newNumber) {
     }
   }
 
-
   if (newNumber == 0) {
     Serial.println("w");
     client.print("w");
-    // if (client.connected()) {
-    //   client.println("w\n");
-    // }
   } else if (newNumber == 1) {
     Serial.println("s");
     client.print("s");
@@ -202,6 +207,7 @@ void pushLastFive(int newNumber) {
   printLastFive();
 }
 
+// connect / disconnect to server
 void toggleClient() {
 
   if (!client.connected()) {
